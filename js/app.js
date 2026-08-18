@@ -5,6 +5,8 @@ import { initItemCrud } from './features/item-crud.js';
 import { initListCrud } from './features/list-crud.js';
 import { initHistory } from './features/history.js';
 import { initAutocomplete, initMacheron } from './features/autocomplete.js';
+import { initImport } from './features/import.js';
+import { initVoiceInput } from './features/voice.js';
 
 function initNavTabs() {
   document.querySelectorAll('.tab-btn[data-page]').forEach((btn) => {
@@ -58,4 +60,6 @@ initListCrud();
 initHistory();
 initAutocomplete();
 initMacheron();
+initImport();
+initVoiceInput();
 render();

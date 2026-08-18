@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#7367f0">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <div id="app">
@@ -23,6 +24,7 @@
         <div id="listNameDisplay" class="list-name-display"></div>
         <div id="itemCountDisplay" class="item-count-display"></div>
       </div>
+      <button id="lnbImportBtn" class="icon-btn" aria-label="ייבוא פריטים" title="ייבוא">📋</button>
       <button id="searchIconBtn" class="icon-btn" aria-label="חיפוש ברשימה" title="חיפוש">🔍</button>
     </div>
 
@@ -77,7 +79,10 @@
       <form id="itemForm">
         <input type="hidden" id="itemFormId">
         <label for="itemName">שם הפריט</label>
-        <input id="itemName" type="text" required autocomplete="off">
+        <div style="display:flex;gap:8px;">
+          <input id="itemName" type="text" required autocomplete="off" style="flex:1;">
+          <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול">🎤</button>
+        </div>
         <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
 
         <div class="form-row">
@@ -142,6 +147,24 @@
     <div class="modal-card">
       <h2>היסטוריית רשימות</h2>
       <div id="historyContent" class="summary-container"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">סגירה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import modal -->
+  <div id="importModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>ייבוא פריטים</h2>
+      <label for="importText">הדביקו רשימה (שורה לכל פריט, אפשר עם מחיר בסוף)</label>
+      <textarea id="importText" rows="6" placeholder="חלב&#10;לחם - 8&#10;עגבניות x3"></textarea>
+      <div class="modal-actions">
+        <button type="button" id="importFromClipboardBtn" class="btn-secondary">📋 מהלוח</button>
+        <button type="button" id="importTextBtn" class="btn-primary">ייבוא</button>
+      </div>
+      <label for="excelFileInput" style="margin-top:14px;">או ייבוא מקובץ Excel</label>
+      <input id="excelFileInput" type="file" accept=".xlsx,.xls">
       <div class="modal-actions">
         <button type="button" class="btn-secondary modal-cancel">סגירה</button>
       </div>
