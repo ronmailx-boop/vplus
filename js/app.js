@@ -7,6 +7,7 @@ import { initHistory } from './features/history.js';
 import { initAutocomplete, initMacheron } from './features/autocomplete.js';
 import { initImport } from './features/import.js';
 import { initVoiceInput } from './features/voice.js';
+import { initOrganize } from './features/organize.js';
 
 function initNavTabs() {
   document.querySelectorAll('.tab-btn[data-page]').forEach((btn) => {
@@ -62,4 +63,5 @@ initAutocomplete();
 initMacheron();
 initImport();
 initVoiceInput();
+initOrganize();
 render();

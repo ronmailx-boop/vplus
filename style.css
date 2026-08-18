@@ -100,6 +100,34 @@ html, body {
   justify-content: center;
 }
 
+.toolbar-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 10px;
+}
+
+.icon-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--gray);
+  font-size: 16px;
+  padding: 0 4px;
+}
+
+.item-checkbox-select {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.sortable-ghost {
+  opacity: 0.4;
+}
+
 /* Search bar */
 .list-search-bar {
   display: flex;

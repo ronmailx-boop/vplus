@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 </head>
 <body>
   <div id="app">
@@ -26,6 +27,17 @@
       </div>
       <button id="lnbImportBtn" class="icon-btn" aria-label="ייבוא פריטים" title="ייבוא">📋</button>
       <button id="searchIconBtn" class="icon-btn" aria-label="חיפוש ברשימה" title="חיפוש">🔍</button>
+    </div>
+
+    <div class="toolbar-row">
+      <button id="lockListBtn" class="icon-btn" aria-label="נעילת רשימה" title="נעילת רשימה">🔓</button>
+      <button id="itemEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור" title="מצב עריכה וסידור">✏️</button>
+      <button id="printListBtn" class="icon-btn" aria-label="הדפסת רשימה" title="הדפסה">🖨️</button>
+    </div>
+
+    <div id="bulkDeleteRow" class="toolbar-row hidden">
+      <button id="bulkDeleteItemsBtn" class="btn-danger">מחיקת נבחרים</button>
+      <button id="bulkDeleteCancelBtn" class="btn-secondary">ביטול</button>
     </div>
 
     <div id="listSearchBar" class="list-search-bar hidden">
@@ -48,6 +60,13 @@
 
     <main id="pageSummary" class="page hidden">
       <input id="summarySearchInput" type="search" placeholder="חיפוש בין הרשימות..." autocomplete="off" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--gray-light);font-size:14px;margin-bottom:10px;">
+      <div class="toolbar-row">
+        <button id="listEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור רשימות" title="מצב עריכה וסידור">✏️</button>
+      </div>
+      <div id="bulkDeleteListsRow" class="toolbar-row hidden">
+        <button id="bulkDeleteListsBtn" class="btn-danger">מחיקת נבחרות</button>
+        <button id="bulkDeleteListsCancelBtn" class="btn-secondary">ביטול</button>
+      </div>
       <div id="summaryContainer" class="summary-container"></div>
     </main>
 

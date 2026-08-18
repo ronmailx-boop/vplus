@@ -45,6 +45,7 @@ function normalizeList(list) {
     name: list.name || '',
     url: list.url || '',
     budget: Number(list.budget) || 0,
+    locked: !!list.locked,
     items: Array.isArray(list.items) ? list.items.map(normalizeItem) : [],
   };
 }
@@ -203,6 +204,26 @@ export function restoreFromHistory(index) {
 
 export function deleteHistoryEntry(index) {
   db.history.splice(index, 1);
+  save();
+}
+
+export function reorderListsOrder(newOrder) {
+  db.listsOrder = newOrder.filter((id) => db.lists[id]);
+  save();
+}
+
+export function reorderListItems(listId, newItemIds) {
+  const list = db.lists[listId];
+  if (!list) return;
+  const byId = new Map(list.items.map((i) => [i.id, i]));
+  list.items = newItemIds.map((id) => byId.get(id)).filter(Boolean);
+  save();
+}
+
+export function toggleListLock(listId) {
+  const list = db.lists[listId];
+  if (!list) return;
+  list.locked = !list.locked;
   save();
 }
 

@@ -12,7 +12,17 @@ function populateCategorySelect() {
       .join('');
 }
 
+function isListLocked() {
+  const list = getCurrentList();
+  if (list?.locked) {
+    showToast('הרשימה נעולה — יש לבטל נעילה כדי לערוך');
+    return true;
+  }
+  return false;
+}
+
 function openAddItemModal() {
+  if (isListLocked()) return;
   document.getElementById('itemModalTitle').textContent = 'הוספת פריט';
   document.getElementById('itemForm').reset();
   document.getElementById('itemFormId').value = '';
@@ -69,9 +79,11 @@ function handleItemsContainerClick(e) {
   const action = e.target.closest('[data-action]')?.dataset.action;
 
   if (action === 'toggle') {
+    if (isListLocked()) return;
     toggleItemChecked(db.currentId, itemId);
     render();
   } else if (action === 'delete') {
+    if (isListLocked()) return;
     const list = getCurrentList();
     const item = list.items.find((i) => i.id === itemId);
     const snapshot = { ...item };
@@ -85,6 +97,7 @@ function handleItemsContainerClick(e) {
       },
     });
   } else if (action === 'edit') {
+    if (isListLocked()) return;
     openEditItemModal(itemId);
   }
 }

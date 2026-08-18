@@ -1,6 +1,6 @@
 import { db, createList, renameList, deleteList, selectList } from '../core/store.js';
 import { openModal, closeModal, confirmDialog, showToast } from '../ui/modals.js';
-import { render, setActivePage } from '../ui/render.js';
+import { render, setActivePage, listEditMode } from '../ui/render.js';
 
 function openNewListModal() {
   document.getElementById('listModalTitle').textContent = 'רשימה חדשה';
@@ -31,6 +31,7 @@ function handleListFormSubmit(e) {
 }
 
 async function handleSummaryContainerClick(e) {
+  if (listEditMode) return;
   const deleteBtn = e.target.closest('[data-action="delete-list"]');
   if (deleteBtn) {
     const listId = deleteBtn.dataset.listId;

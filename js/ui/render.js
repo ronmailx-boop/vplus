@@ -4,6 +4,26 @@ import { sanitize, formatCurrency, formatDate } from '../core/utils.js';
 import { renderCharts } from '../features/stats.js';
 
 export let activePage = 'lists';
+export let itemEditMode = false;
+export let listEditMode = false;
+export let selectedItemIds = new Set();
+export let selectedListIds = new Set();
+
+export function setItemEditMode(value) {
+  itemEditMode = value;
+  selectedItemIds = new Set();
+  document.getElementById('bulkDeleteRow').classList.toggle('hidden', !value);
+  document.getElementById('itemEditModeBtn').classList.toggle('active', value);
+  render();
+}
+
+export function setListEditMode(value) {
+  listEditMode = value;
+  selectedListIds = new Set();
+  document.getElementById('bulkDeleteListsRow').classList.toggle('hidden', !value);
+  document.getElementById('listEditModeBtn').classList.toggle('active', value);
+  render();
+}
 
 export function setActivePage(page) {
   activePage = page;
@@ -38,6 +58,8 @@ function renderListNameBar() {
   const total = list.items.length;
   const done = list.items.filter((i) => i.checked).length;
   countEl.textContent = `${done}/${total} פריטים`;
+
+  document.getElementById('lockListBtn').textContent = list.locked ? '🔒' : '🔓';
 }
 
 function itemCardHTML(item) {
@@ -47,6 +69,19 @@ function itemCardHTML(item) {
   if (item.price) metaParts.push(formatCurrency(item.price * item.qty));
   if (item.dueDate) metaParts.push('📅 ' + formatDate(item.dueDate));
   if (item.note) metaParts.push('📝 ' + sanitize(item.note));
+
+  if (itemEditMode) {
+    return `
+      <div class="item-card" data-item-id="${item.id}" style="border-color:${color}">
+        <span class="drag-handle">⠿</span>
+        <input type="checkbox" class="item-checkbox-select" data-action="select" ${selectedItemIds.has(item.id) ? 'checked' : ''}>
+        <div class="item-main">
+          <div class="item-name">${sanitize(item.name)}</div>
+          <div class="item-meta">${metaParts.join(' · ')}</div>
+        </div>
+      </div>
+    `;
+  }
 
   return `
     <div class="item-card ${item.checked ? 'checked' : ''}" data-item-id="${item.id}" style="border-color:${color}">
@@ -90,6 +125,11 @@ function renderItemsPage() {
     return;
   }
 
+  if (itemEditMode) {
+    container.innerHTML = list.items.map(itemCardHTML).join('');
+    return;
+  }
+
   const sorted = sortItemsByStatusAndCategory(list.items, CATEGORY_ORDER);
   let html = '';
   let lastCategory = null;
@@ -115,13 +155,18 @@ function renderSummaryPage() {
       const list = db.lists[id];
       const total = calcListTotal(list);
       const paid = calcListPaid(list);
+      const trailing = listEditMode
+        ? `<input type="checkbox" class="item-checkbox-select" data-action="select-list" ${selectedListIds.has(id) ? 'checked' : ''}>`
+        : `<button data-action="delete-list" data-list-id="${id}" aria-label="מחיקת רשימה" title="מחיקה">🗑️</button>`;
+      const handle = listEditMode ? '<span class="drag-handle">⠿</span>' : '';
       return `
         <div class="summary-row" data-list-id="${id}">
-          <div>
+          ${handle}
+          <div style="flex:1;">
             <div class="summary-name">${sanitize(list.name)}</div>
             <div class="summary-sub">${list.items.length} פריטים · ${formatCurrency(paid)} / ${formatCurrency(total)}</div>
           </div>
-          <button data-action="delete-list" data-list-id="${id}" aria-label="מחיקת רשימה" title="מחיקה">🗑️</button>
+          ${trailing}
         </div>
       `;
     })
