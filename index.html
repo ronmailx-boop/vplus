@@ -7,6 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#7367f0">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body>
   <div id="app">
@@ -33,6 +34,14 @@
     <main id="pageLists" class="page">
       <div id="budgetWarning" class="budget-warning hidden"></div>
       <div id="itemsContainer" class="items-container"></div>
+      <div id="listTotalsBar" class="list-totals-bar">
+        <div class="totals-numbers">
+          <div><span class="totals-label">שולם</span><span id="totalsPaid">₪0</span></div>
+          <div><span class="totals-label">נותר</span><span id="totalsRemaining">₪0</span></div>
+          <div><span class="totals-label">סה"כ</span><span id="totalsTotal">₪0</span></div>
+        </div>
+        <button id="finishListBtn" class="btn-danger">סיום רשימה</button>
+      </div>
     </main>
 
     <main id="pageSummary" class="page hidden">
@@ -41,6 +50,7 @@
 
     <main id="pageStats" class="page hidden">
       <div id="statsContainer" class="stats-container"></div>
+      <button id="openHistoryBtn" class="btn-secondary" style="margin-top:12px;">📜 היסטוריית רשימות</button>
     </main>
 
     <div id="toastBar" class="toast-bar hidden">
@@ -119,6 +129,17 @@
           <button type="submit" class="btn-primary">שמירה</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- History modal -->
+  <div id="historyModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>היסטוריית רשימות</h2>
+      <div id="historyContent" class="summary-container"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">סגירה</button>
+      </div>
     </div>
   </div>
 

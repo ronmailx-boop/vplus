@@ -1,6 +1,7 @@
 import { db, getCurrentList, calcListTotal, calcListPaid, sortItemsByStatusAndCategory } from '../core/store.js';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ORDER } from '../core/constants.js';
 import { sanitize, formatCurrency, formatDate } from '../core/utils.js';
+import { renderCharts } from '../features/stats.js';
 
 export let activePage = 'lists';
 
@@ -72,6 +73,11 @@ function renderItemsPage() {
   }
 
   const total = calcListTotal(list);
+  const paid = calcListPaid(list);
+  document.getElementById('totalsPaid').textContent = formatCurrency(paid);
+  document.getElementById('totalsRemaining').textContent = formatCurrency(total - paid);
+  document.getElementById('totalsTotal').textContent = formatCurrency(total);
+
   if (list.budget > 0 && total > list.budget) {
     budgetWarning.textContent = `⚠️ חריגה מהתקציב: ${formatCurrency(total)} מתוך ${formatCurrency(list.budget)}`;
     budgetWarning.classList.remove('hidden');
@@ -145,5 +151,18 @@ function renderStatsPage() {
         <div class="summary-sub">${formatCurrency(db.stats.totalSpent)}</div>
       </div>
     </div>
+    <div class="chart-card">
+      <h3>הוצאות חודשיות</h3>
+      <canvas id="monthlyChart" height="180"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>פילוח לפי קטגוריה</h3>
+      <canvas id="categoryChart" height="200"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>פריטים פופולריים</h3>
+      <ul id="popularItemsList" style="margin:0;padding-inline-start:18px;font-size:13px;"></ul>
+    </div>
   `;
+  renderCharts();
 }

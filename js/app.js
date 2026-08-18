@@ -3,6 +3,7 @@ import { render, setActivePage } from './ui/render.js';
 import { setupGenericModalDismiss } from './ui/modals.js';
 import { initItemCrud } from './features/item-crud.js';
 import { initListCrud } from './features/list-crud.js';
+import { initHistory } from './features/history.js';
 
 function initNavTabs() {
   document.querySelectorAll('.tab-btn[data-page]').forEach((btn) => {
@@ -41,4 +42,5 @@ initNavTabs();
 initListSearch();
 initItemCrud();
 initListCrud();
+initHistory();
 render();
