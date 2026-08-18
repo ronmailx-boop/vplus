@@ -2,14 +2,137 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
   <title>vplus</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#7367f0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <header class="app-header">
+      <div class="app-logo">
+        <span class="logo-v">V</span><span class="logo-plus">plus</span>
+      </div>
+    </header>
+
+    <div id="listNameBar" class="list-name-bar">
+      <button id="lnbNewListBtn" class="icon-btn" aria-label="רשימה חדשה" title="רשימה חדשה">➕</button>
+      <div class="lnb-info">
+        <div id="listNameDisplay" class="list-name-display"></div>
+        <div id="itemCountDisplay" class="item-count-display"></div>
+      </div>
+      <button id="searchIconBtn" class="icon-btn" aria-label="חיפוש ברשימה" title="חיפוש">🔍</button>
+    </div>
+
+    <div id="listSearchBar" class="list-search-bar hidden">
+      <input id="listSearchInput" type="search" placeholder="חיפוש בתוך הרשימה..." autocomplete="off">
+      <button id="clearListSearchBtn" class="icon-btn" aria-label="סגור חיפוש">✕</button>
+    </div>
+
+    <main id="pageLists" class="page">
+      <div id="budgetWarning" class="budget-warning hidden"></div>
+      <div id="itemsContainer" class="items-container"></div>
+    </main>
+
+    <main id="pageSummary" class="page hidden">
+      <div id="summaryContainer" class="summary-container"></div>
+    </main>
+
+    <main id="pageStats" class="page hidden">
+      <div id="statsContainer" class="stats-container"></div>
+    </main>
+
+    <div id="toastBar" class="toast-bar hidden">
+      <div id="toastContent" class="toast-content"></div>
+      <button id="toastUndoBtn" class="toast-undo-btn hidden">בטל</button>
+    </div>
+
+    <nav class="bottom-bar">
+      <button id="tabLists" class="tab-btn active" data-page="lists">📋<span>רשימה</span></button>
+      <button id="fabAddItem" class="fab-btn" aria-label="הוסף פריט" title="הוסף פריט">+</button>
+      <button id="tabSummary" class="tab-btn" data-page="summary">🗂️<span>כל הרשימות</span></button>
+      <button id="tabStats" class="tab-btn" data-page="stats">📊<span>סטטיסטיקה</span></button>
+    </nav>
+  </div>
+
+  <!-- Add / Edit item modal -->
+  <div id="itemModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2 id="itemModalTitle">הוספת פריט</h2>
+      <form id="itemForm">
+        <input type="hidden" id="itemFormId">
+        <label for="itemName">שם הפריט</label>
+        <input id="itemName" type="text" required autocomplete="off">
+
+        <div class="form-row">
+          <div>
+            <label for="itemPrice">מחיר</label>
+            <input id="itemPrice" type="number" step="0.01" min="0" inputmode="decimal">
+          </div>
+          <div>
+            <label for="itemQty">כמות</label>
+            <input id="itemQty" type="number" step="1" min="1" value="1" inputmode="numeric">
+          </div>
+        </div>
+
+        <label for="itemCategorySelect">קטגוריה</label>
+        <select id="itemCategorySelect"></select>
+
+        <button type="button" id="itemAdvancedToggle" class="link-btn">הצג שדות נוספים ▾</button>
+        <div id="itemAdvancedFields" class="hidden">
+          <label for="itemDueDate">תאריך יעד</label>
+          <input id="itemDueDate" type="date">
+
+          <label for="itemNote">הערה</label>
+          <textarea id="itemNote" rows="2"></textarea>
+
+          <label for="itemPaymentUrl">קישור תשלום</label>
+          <input id="itemPaymentUrl" type="url" placeholder="https://...">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary modal-cancel">ביטול</button>
+          <button type="submit" class="btn-primary">שמירה</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- New / Edit list modal -->
+  <div id="listModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2 id="listModalTitle">רשימה חדשה</h2>
+      <form id="listForm">
+        <input type="hidden" id="listFormId">
+        <label for="listNameInput">שם הרשימה</label>
+        <input id="listNameInput" type="text" required autocomplete="off">
+
+        <label for="listUrlInput">קישור לחנות (אופציונלי)</label>
+        <input id="listUrlInput" type="url" placeholder="https://...">
+
+        <label for="listBudgetInput">תקציב (אופציונלי)</label>
+        <input id="listBudgetInput" type="number" step="0.01" min="0" inputmode="decimal">
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary modal-cancel">ביטול</button>
+          <button type="submit" class="btn-primary">שמירה</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Generic confirm modal -->
+  <div id="confirmModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <p id="confirmModalText"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">ביטול</button>
+        <button type="button" id="confirmModalOkBtn" class="btn-danger">אישור</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

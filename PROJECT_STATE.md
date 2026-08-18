@@ -47,9 +47,7 @@ vplus/
 
 ### התקדמות
 - [x] שלב 1: Data layer — `js/core/constants.js` (CATEGORIES, CATEGORY_KEYWORDS ללא פיננסי, detectCategory), `js/core/store.js` (db schema, load/save ל-localStorage, CRUD רשימות/פריטים, history, stats). נבדק ידנית ב-Node.
-- [ ] שלב 2: Core CRUD UI + Undo toast
-- [ ] שלב 3: מעטפת UI ראשית (header, ניווט, item cards)
-- [ ] שלב 4: מודלים (הוספה/עריכה/רשימה חדשה)
+- [x] שלבים 2-4: מעטפת UI ראשית + CRUD + מודלים — `index.html`/`style.css` (פלטה מ-shopping-list), `js/ui/render.js` (Lists/Summary/Stats + קיבוץ קטגוריות), `js/ui/modals.js` (מודלים גנריים + toast/undo), `js/features/item-crud.js`, `js/features/list-crud.js`. **נבדק end-to-end ב-Playwright**: הוספה/עריכה/מחיקה+undo/toggle של פריט, יצירה/מחיקה/מעבר בין רשימות, טאבים Lists/Summary/Stats, שמירה ב-localStorage בין רענוני דף — הכל עובד בלי שגיאות קונסולה.
 - [ ] שלב 5: היסטוריה וסטטיסטיקה
 - [ ] שלב 6: Autocomplete/מחירון/חיפוש
 - [ ] שלב 7: ייבוא (טקסט/לוח/Excel/קול)
@@ -58,7 +56,7 @@ vplus/
 - [ ] שלב 10: QA מקצה לקצה + מיזוג ל-main
 
 ## Current Focus
-בעיצומה של הבנייה המלאה (ראו התקדמות למעלה). ממשיכים לשלב 2 (Core CRUD UI).
+בעיצומה של הבנייה המלאה (ראו התקדמות למעלה). ממשיכים לשלב 5 (היסטוריה וסטטיסטיקה מלאה).
 
 ## משימות
 - [x] אימות מצב ריפו vplus (ריק, ברנץ' מעודכן)
