@@ -1,7 +1,9 @@
 # PROJECT_STATE — vplus
 
 ## סטטוס כללי
-פרויקט חדש, בבנייה מאפס. הריפו `vplus` עדיין ריק (רק `CLAUDE.md`, `README.md`, וקובץ זה). הבנייה תתבסס על הריפו הקיים `ronmailx-boop/shopping-list` (פרטי), שצורף לסשן ושוכפל מקומית ל-`/workspace/shopping-list` לצורך עיון.
+פרויקט חדש, בבנייה מאפס. הבנייה מתבססת על הריפו הקיים `ronmailx-boop/shopping-list` (פרטי), שצורף לסשן ושוכפל מקומית ל-`/workspace/shopping-list` לצורך עיון.
+
+**החלטה ארכיטקטונית (עודכן):** כרגע האפליקציה נבנית **ללא שרת Firebase** — אין Firestore, אין Auth, אין Cloud Functions. אין עדיין מנגנון חלופי לאחסון נתונים; ייקבע כשיתבקש.
 
 ## תובנות ראשוניות מ-Shopping-list (מקור ההשראה)
 - אפליקציית PWA וניל-JS (ללא build step, אין `package.json` בשורש) עם Firebase Web SDK בצד לקוח.
@@ -22,7 +24,6 @@ vplus/
 ├── js/
 │   ├── app.js          # נקודת כניסה
 │   ├── core/
-│   │   ├── firebase-config.js  # placeholder — ללא ערכים אמיתיים עדיין
 │   │   ├── constants.js
 │   │   ├── store.js
 │   │   └── utils.js     # כולל sanitize() למניעת XSS
@@ -31,14 +32,15 @@ vplus/
 ├── assets/icons/         # ריק, לאייקוני PWA עתידיים
 └── docs/legal/           # ריק, למסמכי משפט (privacy-policy וכו' לפי CLAUDE.md)
 ```
-אין עדיין `functions/` (Firebase Cloud Functions) — ייווצר כשיידרש backend בפועל.
+אין `functions/` (Firebase Cloud Functions) ואין תלות ב-Firebase כלל בשלב זה.
 
 ## Current Focus
-שלד הפרויקט הבסיסי נוצר. ממתינים להנחיית המשתמש לצעד הבא (למשל: הגדרת פרויקט Firebase אמיתי, מסך התחברות/login, או מבנה הנתונים הראשי).
+שלד הפרויקט קיים, ללא Firebase. ממתינים להנחיית המשתמש לצעד הבא.
 
 ## משימות
 - [x] אימות מצב ריפו vplus (ריק, ברנץ' מעודכן)
 - [x] איתור וצירוף ריפו shopping-list כמקור השראה
 - [x] יצירת PROJECT_STATE.md
 - [x] יצירת שלד פרויקט — מבנה תיקיות בסיסי
+- [x] הסרת תלות ב-Firebase מהשלד (החלטה: ללא שרת בשלב זה)
 - [ ] קבלת הנחיית המשתמש לצעד הבא בבנייה
