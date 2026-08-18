@@ -52,6 +52,16 @@ function initSummarySearch() {
   });
 }
 
+function handleShortcutParams() {
+  const params = new URLSearchParams(location.search);
+  if (params.get('page') === 'stats') {
+    setActivePage('stats');
+  }
+  if (params.get('action') === 'new-list') {
+    document.getElementById('lnbNewListBtn').click();
+  }
+}
+
 setupGenericModalDismiss();
 initNavTabs();
 initListSearch();
@@ -65,3 +75,12 @@ initImport();
 initVoiceInput();
 initOrganize();
 render();
+handleShortcutParams();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {
+      console.warn("רישום ה-Service Worker נכשל — האפליקציה תמשיך לעבוד ללא מצב אופליין");
+    });
+  });
+}
