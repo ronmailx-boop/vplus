@@ -11,11 +11,34 @@
 - `firestore.rules`, `.firebaserc`, `firebase.json` — תשתית Firebase Hosting + Firestore.
 - יש התחלת תמיכה ב-Push Notifications (`push-notifications.js`, `notification-handler.js`) ו-PWA (ikonים, manifest, `.well-known/assetlinks.json` ל-TWA).
 
+## מבנה התיקיות שנוצר (שלד ראשוני)
+```
+vplus/
+├── index.html          # דף כניסה, RTL, טוען js/app.js כמודול
+├── style.css
+├── manifest.json       # PWA manifest (עברית, RTL)
+├── sw.js               # Service Worker בסיסי (install/activate)
+├── .gitignore
+├── js/
+│   ├── app.js          # נקודת כניסה
+│   ├── core/
+│   │   ├── firebase-config.js  # placeholder — ללא ערכים אמיתיים עדיין
+│   │   ├── constants.js
+│   │   ├── store.js
+│   │   └── utils.js     # כולל sanitize() למניעת XSS
+│   ├── features/        # ריק, ל-features עתידיים
+│   └── ui/               # ריק, לרכיבי UI עתידיים
+├── assets/icons/         # ריק, לאייקוני PWA עתידיים
+└── docs/legal/           # ריק, למסמכי משפט (privacy-policy וכו' לפי CLAUDE.md)
+```
+אין עדיין `functions/` (Firebase Cloud Functions) — ייווצר כשיידרש backend בפועל.
+
 ## Current Focus
-ממתינים להנחיית המשתמש לגבי הצעד הראשון הקונקרטי בבניית vplus (למשל: הקמת שלד הפרויקט, בחירת סטאק/ארכיטקטורה, או ייבוא/עיבוד רכיב ספציפי מ-Shopping-list). לא בוצע שום שינוי קוד ב-vplus מעבר לקובץ זה.
+שלד הפרויקט הבסיסי נוצר. ממתינים להנחיית המשתמש לצעד הבא (למשל: הגדרת פרויקט Firebase אמיתי, מסך התחברות/login, או מבנה הנתונים הראשי).
 
 ## משימות
 - [x] אימות מצב ריפו vplus (ריק, ברנץ' מעודכן)
 - [x] איתור וצירוף ריפו shopping-list כמקור השראה
 - [x] יצירת PROJECT_STATE.md
+- [x] יצירת שלד פרויקט — מבנה תיקיות בסיסי
 - [ ] קבלת הנחיית המשתמש לצעד הבא בבנייה
