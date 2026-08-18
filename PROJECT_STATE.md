@@ -42,8 +42,23 @@ vplus/
 ```
 אין `functions/` (Firebase Cloud Functions) ואין תלות ב-Firebase כלל בשלב זה.
 
+## תוכנית בנייה מלאה
+המשתמש אישר בנייה מלאה של אפליקציית רשימת קניות, זהה גרפית ותפעולית ל-shopping-list (חוץ מההחרגות למעלה), עם מיזוג ל-main בסיום. תוכנית מפורטת (10 שלבים) נשמרה גם ב-`/root/.claude/plans/frolicking-dreaming-bonbon.md`. הוחלט גם: בלי פאנל התראות פנימי/תזכורות תאריך יעד, בלי סריקת קבלה (OCR).
+
+### התקדמות
+- [x] שלב 1: Data layer — `js/core/constants.js` (CATEGORIES, CATEGORY_KEYWORDS ללא פיננסי, detectCategory), `js/core/store.js` (db schema, load/save ל-localStorage, CRUD רשימות/פריטים, history, stats). נבדק ידנית ב-Node.
+- [ ] שלב 2: Core CRUD UI + Undo toast
+- [ ] שלב 3: מעטפת UI ראשית (header, ניווט, item cards)
+- [ ] שלב 4: מודלים (הוספה/עריכה/רשימה חדשה)
+- [ ] שלב 5: היסטוריה וסטטיסטיקה
+- [ ] שלב 6: Autocomplete/מחירון/חיפוש
+- [ ] שלב 7: ייבוא (טקסט/לוח/Excel/קול)
+- [ ] שלב 8: גרירה, מצב קומפקטי, תקציב, הדפסה
+- [ ] שלב 9: ליטוש PWA
+- [ ] שלב 10: QA מקצה לקצה + מיזוג ל-main
+
 ## Current Focus
-שלד הפרויקט קיים, ללא Firebase. ממתינים להנחיית המשתמש לצעד הבא.
+בעיצומה של הבנייה המלאה (ראו התקדמות למעלה). ממשיכים לשלב 2 (Core CRUD UI).
 
 ## משימות
 - [x] אימות מצב ריפו vplus (ריק, ברנץ' מעודכן)
