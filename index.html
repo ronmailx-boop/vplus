@@ -45,12 +45,16 @@
     </main>
 
     <main id="pageSummary" class="page hidden">
+      <input id="summarySearchInput" type="search" placeholder="חיפוש בין הרשימות..." autocomplete="off" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--gray-light);font-size:14px;margin-bottom:10px;">
       <div id="summaryContainer" class="summary-container"></div>
     </main>
 
     <main id="pageStats" class="page hidden">
       <div id="statsContainer" class="stats-container"></div>
-      <button id="openHistoryBtn" class="btn-secondary" style="margin-top:12px;">📜 היסטוריית רשימות</button>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button id="openHistoryBtn" class="btn-secondary">📜 היסטוריה</button>
+        <button id="openMacheronBtn" class="btn-secondary">💰 מחירון</button>
+      </div>
     </main>
 
     <div id="toastBar" class="toast-bar hidden">
@@ -74,6 +78,7 @@
         <input type="hidden" id="itemFormId">
         <label for="itemName">שם הפריט</label>
         <input id="itemName" type="text" required autocomplete="off">
+        <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
 
         <div class="form-row">
           <div>
@@ -137,6 +142,18 @@
     <div class="modal-card">
       <h2>היסטוריית רשימות</h2>
       <div id="historyContent" class="summary-container"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">סגירה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Price list (מחירון) modal -->
+  <div id="macheronModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>מחירון</h2>
+      <input id="macheronSearch" type="search" placeholder="חיפוש מוצר..." autocomplete="off">
+      <div id="macheronContent" class="summary-container" style="margin-top:12px;"></div>
       <div class="modal-actions">
         <button type="button" class="btn-secondary modal-cancel">סגירה</button>
       </div>

@@ -49,14 +49,14 @@ vplus/
 - [x] שלב 1: Data layer — `js/core/constants.js` (CATEGORIES, CATEGORY_KEYWORDS ללא פיננסי, detectCategory), `js/core/store.js` (db schema, load/save ל-localStorage, CRUD רשימות/פריטים, history, stats). נבדק ידנית ב-Node.
 - [x] שלבים 2-4: מעטפת UI ראשית + CRUD + מודלים — `index.html`/`style.css` (פלטה מ-shopping-list), `js/ui/render.js` (Lists/Summary/Stats + קיבוץ קטגוריות), `js/ui/modals.js` (מודלים גנריים + toast/undo), `js/features/item-crud.js`, `js/features/list-crud.js`. **נבדק end-to-end ב-Playwright**: הוספה/עריכה/מחיקה+undo/toggle של פריט, יצירה/מחיקה/מעבר בין רשימות, טאבים Lists/Summary/Stats, שמירה ב-localStorage בין רענוני דף — הכל עובד בלי שגיאות קונסולה.
 - [x] שלב 5: היסטוריה וסטטיסטיקה — `js/features/history.js` (סיום רשימה→היסטוריה, מודל היסטוריה, שחזור/מחיקה), `js/features/stats.js` (גרפים חודשי/קטגוריה/פריטים פופולריים עם Chart.js דרך CDN). נבדק ב-Playwright: סיום רשימה, מודל היסטוריה, שחזור עובדים תקין. **הערה**: Chart.js נטען מ-CDN חיצוני (jsdelivr) — בסביבת הבדיקה הנוכחית (sandbox) ה-CDN חסום ע"י מדיניות הפרוקסי, כך שלא ניתן היה לאמת ויזואלית את הגרפים כאן; הקוד מוגן (`if (window.Chart)`) כך שהאפליקציה לא קורסת בלעדיו. אצל משתמשי קצה אמיתיים (דפדפן רגיל) ה-CDN אמור לעבוד כרגיל.
-- [ ] שלב 6: Autocomplete/מחירון/חיפוש
+- [x] שלב 6: Autocomplete/מחירון/חיפוש — `js/features/autocomplete.js` (הצעות אוטומטיות בעת הוספת פריט לפי היסטוריית מחירים, מודל מחירון עם חיפוש/עריכת מחיר/הסתרה), חיפוש בין רשימות ב-Summary. נבדק ב-Playwright — עובד תקין, ללא שגיאות.
 - [ ] שלב 7: ייבוא (טקסט/לוח/Excel/קול)
 - [ ] שלב 8: גרירה, מצב קומפקטי, תקציב, הדפסה
 - [ ] שלב 9: ליטוש PWA
 - [ ] שלב 10: QA מקצה לקצה + מיזוג ל-main
 
 ## Current Focus
-בעיצומה של הבנייה המלאה (ראו התקדמות למעלה). ממשיכים לשלב 6 (Autocomplete/מחירון/חיפוש).
+בעיצומה של הבנייה המלאה (ראו התקדמות למעלה). ממשיכים לשלב 7 (ייבוא: טקסט/לוח/Excel/קול).
 
 ## משימות
 - [x] אימות מצב ריפו vplus (ריק, ברנץ' מעודכן)

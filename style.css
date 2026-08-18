@@ -399,6 +399,29 @@ html, body {
   font-family: inherit;
 }
 
+.autocomplete-list {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--gray-light);
+  border-radius: 12px;
+  margin-top: -6px;
+  max-height: 160px;
+  overflow-y: auto;
+  z-index: 5;
+}
+
+.autocomplete-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+.autocomplete-item:hover {
+  background: var(--bg-light);
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

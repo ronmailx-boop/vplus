@@ -4,6 +4,7 @@ import { setupGenericModalDismiss } from './ui/modals.js';
 import { initItemCrud } from './features/item-crud.js';
 import { initListCrud } from './features/list-crud.js';
 import { initHistory } from './features/history.js';
+import { initAutocomplete, initMacheron } from './features/autocomplete.js';
 
 function initNavTabs() {
   document.querySelectorAll('.tab-btn[data-page]').forEach((btn) => {
@@ -37,10 +38,24 @@ function initListSearch() {
   input.addEventListener('input', applyFilter);
 }
 
+function initSummarySearch() {
+  const input = document.getElementById('summarySearchInput');
+  input.addEventListener('input', () => {
+    const term = input.value.trim().toLowerCase();
+    document.querySelectorAll('#summaryContainer .summary-row').forEach((row) => {
+      const name = row.querySelector('.summary-name')?.textContent.toLowerCase() || '';
+      row.style.display = !term || name.includes(term) ? '' : 'none';
+    });
+  });
+}
+
 setupGenericModalDismiss();
 initNavTabs();
 initListSearch();
+initSummarySearch();
 initItemCrud();
 initListCrud();
 initHistory();
+initAutocomplete();
+initMacheron();
 render();
