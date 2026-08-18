@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <title>vplus</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <meta name="theme-color" content="#7367f0">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="app-logo">
+        <span class="logo-v">V</span><span class="logo-plus">plus</span>
+      </div>
+    </header>
+
+    <div id="listNameBar" class="list-name-bar">
+      <button id="lnbNewListBtn" class="icon-btn" aria-label="רשימה חדשה" title="רשימה חדשה">➕</button>
+      <div class="lnb-info">
+        <div id="listNameDisplay" class="list-name-display"></div>
+        <div id="itemCountDisplay" class="item-count-display"></div>
+      </div>
+      <button id="lnbImportBtn" class="icon-btn" aria-label="ייבוא פריטים" title="ייבוא">📋</button>
+      <button id="searchIconBtn" class="icon-btn" aria-label="חיפוש ברשימה" title="חיפוש">🔍</button>
+    </div>
+
+    <div class="toolbar-row">
+      <button id="lockListBtn" class="icon-btn" aria-label="נעילת רשימה" title="נעילת רשימה">🔓</button>
+      <button id="itemEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור" title="מצב עריכה וסידור">✏️</button>
+      <button id="printListBtn" class="icon-btn" aria-label="הדפסת רשימה" title="הדפסה">🖨️</button>
+    </div>
+
+    <div id="bulkDeleteRow" class="toolbar-row hidden">
+      <button id="bulkDeleteItemsBtn" class="btn-danger">מחיקת נבחרים</button>
+      <button id="bulkDeleteCancelBtn" class="btn-secondary">ביטול</button>
+    </div>
+
+    <div id="listSearchBar" class="list-search-bar hidden">
+      <input id="listSearchInput" type="search" placeholder="חיפוש בתוך הרשימה..." autocomplete="off">
+      <button id="clearListSearchBtn" class="icon-btn" aria-label="סגור חיפוש">✕</button>
+    </div>
+
+    <main id="pageLists" class="page">
+      <div id="budgetWarning" class="budget-warning hidden"></div>
+      <div id="itemsContainer" class="items-container"></div>
+      <div id="listTotalsBar" class="list-totals-bar">
+        <div class="totals-numbers">
+          <div><span class="totals-label">שולם</span><span id="totalsPaid">₪0</span></div>
+          <div><span class="totals-label">נותר</span><span id="totalsRemaining">₪0</span></div>
+          <div><span class="totals-label">סה"כ</span><span id="totalsTotal">₪0</span></div>
+        </div>
+        <button id="finishListBtn" class="btn-danger">סיום רשימה</button>
+      </div>
+    </main>
+
+    <main id="pageSummary" class="page hidden">
+      <input id="summarySearchInput" type="search" placeholder="חיפוש בין הרשימות..." autocomplete="off" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--gray-light);font-size:14px;margin-bottom:10px;">
+      <div class="toolbar-row">
+        <button id="listEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור רשימות" title="מצב עריכה וסידור">✏️</button>
+      </div>
+      <div id="bulkDeleteListsRow" class="toolbar-row hidden">
+        <button id="bulkDeleteListsBtn" class="btn-danger">מחיקת נבחרות</button>
+        <button id="bulkDeleteListsCancelBtn" class="btn-secondary">ביטול</button>
+      </div>
+      <div id="summaryContainer" class="summary-container"></div>
+    </main>
+
+    <main id="pageStats" class="page hidden">
+      <div id="statsContainer" class="stats-container"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button id="openHistoryBtn" class="btn-secondary">📜 היסטוריה</button>
+        <button id="openMacheronBtn" class="btn-secondary">💰 מחירון</button>
+      </div>
+    </main>
+
+    <div id="toastBar" class="toast-bar hidden">
+      <div id="toastContent" class="toast-content"></div>
+      <button id="toastUndoBtn" class="toast-undo-btn hidden">בטל</button>
+    </div>
+
+    <nav class="bottom-bar">
+      <button id="tabLists" class="tab-btn active" data-page="lists">📋<span>רשימה</span></button>
+      <button id="fabAddItem" class="fab-btn" aria-label="הוסף פריט" title="הוסף פריט">+</button>
+      <button id="tabSummary" class="tab-btn" data-page="summary">🗂️<span>כל הרשימות</span></button>
+      <button id="tabStats" class="tab-btn" data-page="stats">📊<span>סטטיסטיקה</span></button>
+    </nav>
+  </div>
+
+  <!-- Add / Edit item modal -->
+  <div id="itemModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2 id="itemModalTitle">הוספת פריט</h2>
+      <form id="itemForm">
+        <input type="hidden" id="itemFormId">
+        <label for="itemName">שם הפריט</label>
+        <div style="display:flex;gap:8px;">
+          <input id="itemName" type="text" required autocomplete="off" style="flex:1;">
+          <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול">🎤</button>
+        </div>
+        <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
+
+        <div class="form-row">
+          <div>
+            <label for="itemPrice">מחיר</label>
+            <input id="itemPrice" type="number" step="0.01" min="0" inputmode="decimal">
+          </div>
+          <div>
+            <label for="itemQty">כמות</label>
+            <input id="itemQty" type="number" step="1" min="1" value="1" inputmode="numeric">
+          </div>
+        </div>
+
+        <label for="itemCategorySelect">קטגוריה</label>
+        <select id="itemCategorySelect"></select>
+
+        <button type="button" id="itemAdvancedToggle" class="link-btn">הצג שדות נוספים ▾</button>
+        <div id="itemAdvancedFields" class="hidden">
+          <label for="itemDueDate">תאריך יעד</label>
+          <input id="itemDueDate" type="date">
+
+          <label for="itemNote">הערה</label>
+          <textarea id="itemNote" rows="2"></textarea>
+
+          <label for="itemPaymentUrl">קישור תשלום</label>
+          <input id="itemPaymentUrl" type="url" placeholder="https://...">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary modal-cancel">ביטול</button>
+          <button type="submit" class="btn-primary">שמירה</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- New / Edit list modal -->
+  <div id="listModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2 id="listModalTitle">רשימה חדשה</h2>
+      <form id="listForm">
+        <input type="hidden" id="listFormId">
+        <label for="listNameInput">שם הרשימה</label>
+        <input id="listNameInput" type="text" required autocomplete="off">
+
+        <label for="listUrlInput">קישור לחנות (אופציונלי)</label>
+        <input id="listUrlInput" type="url" placeholder="https://...">
+
+        <label for="listBudgetInput">תקציב (אופציונלי)</label>
+        <input id="listBudgetInput" type="number" step="0.01" min="0" inputmode="decimal">
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary modal-cancel">ביטול</button>
+          <button type="submit" class="btn-primary">שמירה</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- History modal -->
+  <div id="historyModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>היסטוריית רשימות</h2>
+      <div id="historyContent" class="summary-container"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">סגירה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import modal -->
+  <div id="importModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>ייבוא פריטים</h2>
+      <label for="importText">הדביקו רשימה (שורה לכל פריט, אפשר עם מחיר בסוף)</label>
+      <textarea id="importText" rows="6" placeholder="חלב&#10;לחם - 8&#10;עגבניות x3"></textarea>
+      <div class="modal-actions">
+        <button type="button" id="importFromClipboardBtn" class="btn-secondary">📋 מהלוח</button>
+        <button type="button" id="importTextBtn" class="btn-primary">ייבוא</button>
+      </div>
+      <label for="excelFileInput" style="margin-top:14px;">או ייבוא מקובץ Excel</label>
+      <input id="excelFileInput" type="file" accept=".xlsx,.xls">
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">סגירה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Price list (מחירון) modal -->
+  <div id="macheronModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>מחירון</h2>
+      <input id="macheronSearch" type="search" placeholder="חיפוש מוצר..." autocomplete="off">
+      <div id="macheronContent" class="summary-container" style="margin-top:12px;"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">סגירה</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic confirm modal -->
+  <div id="confirmModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <p id="confirmModalText"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">ביטול</button>
+        <button type="button" id="confirmModalOkBtn" class="btn-danger">אישור</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
