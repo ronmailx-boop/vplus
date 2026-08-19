@@ -7,7 +7,10 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#7367f0">
+  <meta name="theme-color" content="#161826">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -19,23 +22,29 @@
       <div class="app-logo">
         <span class="logo-v">V</span><span class="logo-plus">plus</span>
       </div>
+      <div class="toolbar-row" style="padding:0">
+        <button id="searchIconBtn" class="icon-btn" aria-label="חיפוש ברשימה" title="חיפוש"><i class="ph ph-magnifying-glass"></i></button>
+        <button id="lnbImportBtn" class="icon-btn" aria-label="ייבוא פריטים" title="ייבוא"><i class="ph ph-clipboard-text"></i></button>
+        <button id="lockListBtn" class="icon-btn" aria-label="נעילת רשימה" title="נעילת רשימה"><i class="ph ph-lock-open"></i></button>
+        <button id="itemEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור" title="מצב עריכה וסידור"><i class="ph ph-pencil-simple"></i></button>
+        <button id="printListBtn" class="icon-btn" aria-label="הדפסת רשימה" title="הדפסה"><i class="ph ph-printer"></i></button>
+      </div>
     </header>
 
     <div id="listNameBar" class="list-name-bar">
-      <button id="lnbNewListBtn" class="icon-btn" aria-label="רשימה חדשה" title="רשימה חדשה">➕</button>
       <div class="lnb-info">
         <div id="listNameDisplay" class="list-name-display"></div>
         <div id="itemCountDisplay" class="item-count-display"></div>
       </div>
-      <button id="lnbImportBtn" class="icon-btn" aria-label="ייבוא פריטים" title="ייבוא">📋</button>
-      <button id="searchIconBtn" class="icon-btn" aria-label="חיפוש ברשימה" title="חיפוש">🔍</button>
+      <button id="lnbNewListBtn" class="icon-btn" aria-label="רשימה חדשה" title="רשימה חדשה"><i class="ph ph-plus-circle"></i></button>
     </div>
 
-    <div class="toolbar-row">
-      <button id="lockListBtn" class="icon-btn" aria-label="נעילת רשימה" title="נעילת רשימה">🔓</button>
-      <button id="itemEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור" title="מצב עריכה וסידור">✏️</button>
-      <button id="printListBtn" class="icon-btn" aria-label="הדפסת רשימה" title="הדפסה">🖨️</button>
-    </div>
+    <nav class="tab-bar">
+      <button id="tabLists" class="tab-btn active" data-page="lists"><span class="tab-label">רשימה</span></button>
+      <button id="tabSummary" class="tab-btn" data-page="summary"><span class="tab-label">רשימות</span></button>
+      <button id="tabStats" class="tab-btn" data-page="stats"><span class="tab-label">תקציב</span></button>
+      <button id="fabAddItem" class="fab-btn" aria-label="הוסף פריט" title="הוסף פריט"><i class="ph ph-plus"></i>פריט</button>
+    </nav>
 
     <div id="bulkDeleteRow" class="toolbar-row hidden">
       <button id="bulkDeleteItemsBtn" class="btn-danger">מחיקת נבחרים</button>
@@ -44,7 +53,7 @@
 
     <div id="listSearchBar" class="list-search-bar hidden">
       <input id="listSearchInput" type="search" placeholder="חיפוש בתוך הרשימה..." autocomplete="off">
-      <button id="clearListSearchBtn" class="icon-btn" aria-label="סגור חיפוש">✕</button>
+      <button id="clearListSearchBtn" class="icon-btn" aria-label="סגור חיפוש"><i class="ph ph-x"></i></button>
     </div>
 
     <main id="pageLists" class="page">
@@ -61,11 +70,11 @@
     </main>
 
     <main id="pageSummary" class="page hidden">
-      <input id="summarySearchInput" type="search" placeholder="חיפוש בין הרשימות..." autocomplete="off" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--gray-light);font-size:14px;margin-bottom:10px;">
-      <div class="toolbar-row">
-        <button id="listEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור רשימות" title="מצב עריכה וסידור">✏️</button>
+      <input id="summarySearchInput" type="search" placeholder="חיפוש בין הרשימות..." autocomplete="off">
+      <div class="toolbar-row" style="padding:10px 0 0">
+        <button id="listEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור רשימות" title="מצב עריכה וסידור"><i class="ph ph-pencil-simple"></i></button>
       </div>
-      <div id="bulkDeleteListsRow" class="toolbar-row hidden">
+      <div id="bulkDeleteListsRow" class="toolbar-row hidden" style="padding:10px 0 0">
         <button id="bulkDeleteListsBtn" class="btn-danger">מחיקת נבחרות</button>
         <button id="bulkDeleteListsCancelBtn" class="btn-secondary">ביטול</button>
       </div>
@@ -75,22 +84,15 @@
     <main id="pageStats" class="page hidden">
       <div id="statsContainer" class="stats-container"></div>
       <div style="display:flex;gap:8px;margin-top:12px;">
-        <button id="openHistoryBtn" class="btn-secondary">📜 היסטוריה</button>
-        <button id="openMacheronBtn" class="btn-secondary">💰 מחירון</button>
+        <button id="openHistoryBtn" class="btn-secondary"><i class="ph ph-clock-counter-clockwise"></i>היסטוריה</button>
+        <button id="openMacheronBtn" class="btn-secondary"><i class="ph ph-currency-circle-dollar"></i>מחירון</button>
       </div>
     </main>
 
     <div id="toastBar" class="toast-bar hidden">
       <div id="toastContent" class="toast-content"></div>
-      <button id="toastUndoBtn" class="toast-undo-btn hidden">בטל</button>
+      <button id="toastUndoBtn" class="toast-undo-btn hidden">ביטול</button>
     </div>
-
-    <nav class="bottom-bar">
-      <button id="tabLists" class="tab-btn active" data-page="lists">📋<span>רשימה</span></button>
-      <button id="fabAddItem" class="fab-btn" aria-label="הוסף פריט" title="הוסף פריט">+</button>
-      <button id="tabSummary" class="tab-btn" data-page="summary">🗂️<span>כל הרשימות</span></button>
-      <button id="tabStats" class="tab-btn" data-page="stats">📊<span>סטטיסטיקה</span></button>
-    </nav>
   </div>
 
   <!-- Add / Edit item modal -->
@@ -102,7 +104,7 @@
         <label for="itemName">שם הפריט</label>
         <div style="display:flex;gap:8px;">
           <input id="itemName" type="text" required autocomplete="off" style="flex:1;">
-          <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול">🎤</button>
+          <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול"><i class="ph ph-microphone"></i></button>
         </div>
         <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
 
@@ -181,7 +183,7 @@
       <label for="importText">הדביקו רשימה (שורה לכל פריט, אפשר עם מחיר בסוף)</label>
       <textarea id="importText" rows="6" placeholder="חלב&#10;לחם - 8&#10;עגבניות x3"></textarea>
       <div class="modal-actions">
-        <button type="button" id="importFromClipboardBtn" class="btn-secondary">📋 מהלוח</button>
+        <button type="button" id="importFromClipboardBtn" class="btn-secondary"><i class="ph ph-clipboard-text"></i>מהלוח</button>
         <button type="button" id="importTextBtn" class="btn-primary">ייבוא</button>
       </div>
       <label for="excelFileInput" style="margin-top:14px;">או ייבוא מקובץ Excel</label>
