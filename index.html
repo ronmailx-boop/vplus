@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#161826">
+  <meta name="theme-color" content="#7367f0">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -20,13 +20,12 @@
   <div id="app">
     <header class="app-header">
       <div class="app-logo">
-        <span class="logo-v">V</span><span class="logo-plus">plus</span>
+        <span class="logo-v">V</span> <span class="logo-plus">plus</span><span class="logo-pro">PRO</span>
       </div>
       <div class="toolbar-row" style="padding:0">
         <button id="searchIconBtn" class="icon-btn" aria-label="חיפוש ברשימה" title="חיפוש"><i class="ph ph-magnifying-glass"></i></button>
         <button id="lnbImportBtn" class="icon-btn" aria-label="ייבוא פריטים" title="ייבוא"><i class="ph ph-clipboard-text"></i></button>
         <button id="lockListBtn" class="icon-btn" aria-label="נעילת רשימה" title="נעילת רשימה"><i class="ph ph-lock-open"></i></button>
-        <button id="itemEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור" title="מצב עריכה וסידור"><i class="ph ph-pencil-simple"></i></button>
         <button id="printListBtn" class="icon-btn" aria-label="הדפסת רשימה" title="הדפסה"><i class="ph ph-printer"></i></button>
       </div>
     </header>
@@ -50,6 +49,11 @@
     </div>
 
     <main id="pageLists" class="page">
+      <div class="pill-row">
+        <button id="itemEditModeBtn" class="pill pill-purple" aria-label="מצב עריכה וסידור" title="מצב עריכה וסידור">✏️ סדר מוצרים</button>
+        <button id="openStatsShortcutBtn" class="pill pill-purple" aria-label="הצג סכום" title="הצג סכום">📊 הצג סכום</button>
+        <button id="openDeleteShortcutBtn" class="pill pill-red" aria-label="מחק פריטים" title="מחק">🗑️ מחק</button>
+      </div>
       <div id="budgetWarning" class="budget-warning hidden"></div>
       <div id="itemsContainer" class="items-container"></div>
       <div id="listTotalsBar" class="list-totals-bar">
@@ -64,8 +68,8 @@
 
     <main id="pageSummary" class="page hidden">
       <input id="summarySearchInput" type="search" placeholder="חיפוש בין הרשימות..." autocomplete="off">
-      <div class="toolbar-row" style="padding:10px 0 0">
-        <button id="listEditModeBtn" class="icon-btn" aria-label="מצב עריכה וסידור רשימות" title="מצב עריכה וסידור"><i class="ph ph-pencil-simple"></i></button>
+      <div class="pill-row" style="padding:10px 0 0">
+        <button id="listEditModeBtn" class="pill pill-purple" aria-label="מצב עריכה וסידור רשימות" title="מצב עריכה וסידור">✏️ סדר רשימות</button>
       </div>
       <div id="bulkDeleteListsRow" class="toolbar-row hidden" style="padding:10px 0 0">
         <button id="bulkDeleteListsBtn" class="btn-danger">מחיקת נבחרות</button>

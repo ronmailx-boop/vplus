@@ -7,6 +7,7 @@ import {
   selectedListIds,
   setItemEditMode,
   setListEditMode,
+  setActivePage,
 } from '../ui/render.js';
 import { showToast, confirmDialog } from '../ui/modals.js';
 
@@ -89,6 +90,8 @@ export function initOrganize() {
 
   document.getElementById('itemEditModeBtn').addEventListener('click', () => setItemEditMode(!itemEditMode));
   document.getElementById('listEditModeBtn').addEventListener('click', () => setListEditMode(!listEditMode));
+  document.getElementById('openStatsShortcutBtn').addEventListener('click', () => setActivePage('stats'));
+  document.getElementById('openDeleteShortcutBtn').addEventListener('click', () => setItemEditMode(true));
   document.getElementById('bulkDeleteCancelBtn').addEventListener('click', () => setItemEditMode(false));
   document.getElementById('bulkDeleteListsCancelBtn').addEventListener('click', () => setListEditMode(false));
   document.getElementById('bulkDeleteItemsBtn').addEventListener('click', handleBulkDeleteItems);

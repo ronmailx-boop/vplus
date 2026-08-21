@@ -1,5 +1,5 @@
 import { db, getCurrentList, calcListTotal, calcListPaid, sortItemsByStatusAndCategory } from '../core/store.js';
-import { CATEGORY_LABELS, CATEGORY_ORDER } from '../core/constants.js';
+import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ORDER } from '../core/constants.js';
 import { sanitize, formatCurrency, formatDate } from '../core/utils.js';
 import { renderCharts } from '../features/stats.js';
 
@@ -89,10 +89,11 @@ function itemCardHTML(item) {
   if (item.dueDate) metaParts.push(formatDate(item.dueDate));
   if (item.note) metaParts.push(sanitize(item.note));
   const lineTotal = item.price ? formatCurrency(item.price * item.qty) : '';
+  const catColor = CATEGORIES[item.category] || CATEGORIES['אחר'];
 
   if (itemEditMode) {
     return `
-      <div class="item-card" data-item-id="${item.id}">
+      <div class="item-card" data-item-id="${item.id}" style="--cat:${catColor}">
         <span class="drag-handle">⠿</span>
         <input type="checkbox" class="item-checkbox-select" data-action="select" ${selectedItemIds.has(item.id) ? 'checked' : ''}>
         <div class="item-main">
@@ -105,7 +106,7 @@ function itemCardHTML(item) {
   }
 
   return `
-    <div class="item-card ${item.checked ? 'checked' : ''}" data-item-id="${item.id}">
+    <div class="item-card ${item.checked ? 'checked' : ''}" data-item-id="${item.id}" style="--cat:${catColor}">
       <div class="item-checkbox ${item.checked ? 'checked' : ''}" data-action="toggle"></div>
       <div class="item-main" data-action="edit">
         <div class="item-name">${sanitize(item.name)}</div>
@@ -121,7 +122,8 @@ function itemCardHTML(item) {
 
 function categoryHeaderHTML(category, sum) {
   const label = CATEGORY_LABELS[category] || category;
-  return `<div class="category-header">${sanitize(label)}<span class="cat-sum">${formatCurrency(sum)}</span></div>`;
+  const color = CATEGORIES[category] || CATEGORIES['אחר'];
+  return `<div class="category-header" style="color:${color}">${sanitize(label)}<span class="cat-sum">${formatCurrency(sum)}</span></div>`;
 }
 
 function renderItemsPage() {
@@ -177,7 +179,7 @@ function renderItemsPage() {
       }
     } else if (!doneHeaderDone) {
       const doneSum = doneItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-      html += `<div class="category-header">נאספו · ${doneItems.length}<span class="cat-sum">${formatCurrency(doneSum)}</span></div>`;
+      html += `<div class="category-header" style="color:var(--color-neutral-300)">נאספו · ${doneItems.length}<span class="cat-sum">${formatCurrency(doneSum)}</span></div>`;
       doneHeaderDone = true;
     }
     html += itemCardHTML(item);
