@@ -1,4 +1,4 @@
-const CACHE_NAME = "vplus-v3";
+const CACHE_NAME = "vplus-v4";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
@@ -42,7 +42,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== location.origin) return;
 
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: "no-store" })
       .then((response) => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
