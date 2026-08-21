@@ -105,11 +105,13 @@
       <form id="itemForm">
         <input type="hidden" id="itemFormId">
         <label for="itemName">שם הפריט</label>
-        <div style="display:flex;gap:8px;">
-          <input id="itemName" type="text" required autocomplete="off" style="flex:1;">
-          <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול"><i class="ph ph-microphone"></i></button>
+        <div style="position:relative;">
+          <div style="display:flex;gap:8px;">
+            <input id="itemName" type="text" required autocomplete="off" style="flex:1;">
+            <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול"><i class="ph ph-microphone"></i></button>
+          </div>
+          <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
         </div>
-        <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
 
         <div class="form-row">
           <div>
