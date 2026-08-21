@@ -1,7 +1,12 @@
-import { db, getCurrentList, addItem, editItem, deleteItem, toggleItemChecked } from '../core/store.js';
+import { db, getCurrentList, createList, addItem, editItem, deleteItem, toggleItemChecked, save } from '../core/store.js';
 import { CATEGORIES } from '../core/constants.js';
 import { openModal, closeModal, showToast } from '../ui/modals.js';
 import { render } from '../ui/render.js';
+
+const CONTINUOUS_ADD_KEY = 'vplus_continuous_add';
+
+let targetListId = null;
+let continuousAdd = localStorage.getItem(CONTINUOUS_ADD_KEY) === 'true';
 
 function populateCategorySelect() {
   const select = document.getElementById('itemCategorySelect');
@@ -21,12 +26,92 @@ function isListLocked() {
   return false;
 }
 
+function updateContextBarDisplay() {
+  const nameEl = document.getElementById('contextListName');
+  nameEl.textContent = db.lists[targetListId]?.name || '—';
+}
+
+function renderListDropdown() {
+  const scroll = document.getElementById('listDropdownScroll');
+  const ids = db.listsOrder.filter((id) => db.lists[id]);
+  scroll.innerHTML = ids
+    .map(
+      (id) => `
+      <div class="list-dropdown-item ${id === targetListId ? 'active' : ''}" data-list-id="${id}">
+        ${db.lists[id].name}
+      </div>
+    `
+    )
+    .join('');
+  document.getElementById('newListFromDropdown').value = '';
+}
+
+function closeListDropdown() {
+  document.getElementById('listDropdown').classList.remove('open');
+  document.getElementById('contextListBtn').classList.remove('open');
+  document.removeEventListener('click', handleOutsideDropdownClick);
+}
+
+function handleOutsideDropdownClick(e) {
+  const bar = document.getElementById('contextBar');
+  if (bar && !bar.contains(e.target)) closeListDropdown();
+}
+
+function toggleListDropdown() {
+  const dropdown = document.getElementById('listDropdown');
+  const isOpen = dropdown.classList.toggle('open');
+  document.getElementById('contextListBtn').classList.toggle('open', isOpen);
+  if (isOpen) {
+    renderListDropdown();
+    setTimeout(() => document.addEventListener('click', handleOutsideDropdownClick), 10);
+  } else {
+    document.removeEventListener('click', handleOutsideDropdownClick);
+  }
+}
+
+function selectTargetList(id) {
+  targetListId = id;
+  updateContextBarDisplay();
+  closeListDropdown();
+}
+
+function handleCreateListFromDropdown() {
+  const input = document.getElementById('newListFromDropdown');
+  const name = input.value.trim();
+  if (!name) {
+    input.focus();
+    return;
+  }
+  const id = createList(name, { switchCurrent: false });
+  targetListId = id;
+  updateContextBarDisplay();
+  closeListDropdown();
+  showToast(`הרשימה "${name}" נוצרה`);
+}
+
+function toggleContinuousMode() {
+  const toggle = document.getElementById('continuousToggle');
+  continuousAdd = toggle.checked;
+  localStorage.setItem(CONTINUOUS_ADD_KEY, continuousAdd);
+  document.getElementById('continuousToggleWrap').classList.toggle('active', continuousAdd);
+  document.getElementById('itemSaveBtn').textContent = continuousAdd ? 'הוסף + המשך ➜' : 'שמירה';
+}
+
 function openAddItemModal() {
   if (isListLocked()) return;
   document.getElementById('itemModalTitle').textContent = 'הוספת פריט';
   document.getElementById('itemForm').reset();
   document.getElementById('itemFormId').value = '';
   document.getElementById('itemAdvancedFields').classList.add('hidden');
+
+  targetListId = db.currentId;
+  updateContextBarDisplay();
+  document.getElementById('continuousToggleWrap').classList.remove('hidden');
+  document.getElementById('contextBar').classList.remove('hidden');
+  document.getElementById('continuousToggle').checked = continuousAdd;
+  document.getElementById('continuousToggleWrap').classList.toggle('active', continuousAdd);
+  document.getElementById('itemSaveBtn').textContent = continuousAdd ? 'הוסף + המשך ➜' : 'שמירה';
+
   openModal('itemModal');
   document.getElementById('itemName').focus();
 }
@@ -44,13 +129,15 @@ function openEditItemModal(itemId) {
   document.getElementById('itemDueDate').value = item.dueDate || '';
   document.getElementById('itemNote').value = item.note || '';
   document.getElementById('itemPaymentUrl').value = item.paymentUrl || '';
+
+  document.getElementById('continuousToggleWrap').classList.add('hidden');
+  document.getElementById('contextBar').classList.add('hidden');
+
   openModal('itemModal');
 }
 
 function handleItemFormSubmit(e) {
   e.preventDefault();
-  const list = getCurrentList();
-  if (!list) return;
   const id = document.getElementById('itemFormId').value;
   const data = {
     name: document.getElementById('itemName').value.trim(),
@@ -65,11 +152,28 @@ function handleItemFormSubmit(e) {
 
   if (id) {
     editItem(db.currentId, id, data);
-  } else {
-    addItem(db.currentId, data);
+    closeModal('itemModal');
+    render();
+    return;
   }
-  closeModal('itemModal');
+
+  const destId = db.lists[targetListId] ? targetListId : db.currentId;
+  if (db.lists[destId]?.locked) {
+    showToast('הרשימה נעולה — יש לבטל נעילה כדי להוסיף אליה');
+    return;
+  }
+  addItem(destId, data);
+  db.currentId = destId;
+  save();
   render();
+
+  if (continuousAdd) {
+    document.getElementById('itemForm').reset();
+    document.getElementById('itemFormId').value = '';
+    setTimeout(() => document.getElementById('itemName').focus(), 80);
+  } else {
+    closeModal('itemModal');
+  }
 }
 
 function handleItemsContainerClick(e) {
@@ -110,4 +214,18 @@ export function initItemCrud() {
     document.getElementById('itemAdvancedFields').classList.toggle('hidden');
   });
   document.getElementById('itemsContainer').addEventListener('click', handleItemsContainerClick);
+
+  document.getElementById('continuousToggle').addEventListener('change', toggleContinuousMode);
+  document.getElementById('contextListBtn').addEventListener('click', toggleListDropdown);
+  document.getElementById('listDropdownScroll').addEventListener('click', (e) => {
+    const item = e.target.closest('.list-dropdown-item');
+    if (item) selectTargetList(item.dataset.listId);
+  });
+  document.getElementById('createListFromDropdownBtn').addEventListener('click', handleCreateListFromDropdown);
+  document.getElementById('newListFromDropdown').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleCreateListFromDropdown();
+    }
+  });
 }

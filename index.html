@@ -101,7 +101,32 @@
   <!-- Add / Edit item modal -->
   <div id="itemModal" class="modal-backdrop hidden">
     <div class="modal-card">
-      <h2 id="itemModalTitle">הוספת פריט</h2>
+      <div class="quick-add-header">
+        <label class="continuous-toggle-wrap" id="continuousToggleWrap">
+          <span class="continuous-toggle-label">⚡ הוספה רציפה</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="continuousToggle">
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+        <h2 id="itemModalTitle">הוספת פריט</h2>
+      </div>
+      <div class="context-bar" id="contextBar">
+        <span class="context-bar-label">➕ מתווסף אל:</span>
+        <button type="button" class="context-list-btn" id="contextListBtn">
+          <span class="context-list-name" id="contextListName"></span>
+          <span class="context-list-arrow">▾</span>
+        </button>
+        <div class="list-dropdown" id="listDropdown">
+          <div class="list-dropdown-scroll" id="listDropdownScroll"></div>
+          <div class="list-dropdown-new">
+            <div class="list-dropdown-new-row">
+              <input class="list-dropdown-new-input" id="newListFromDropdown" placeholder="+ שם רשימה חדשה">
+              <button type="button" class="list-dropdown-new-btn" id="createListFromDropdownBtn">צור ✓</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <form id="itemForm">
         <input type="hidden" id="itemFormId">
         <label for="itemName">שם הפריט</label>
@@ -141,7 +166,7 @@
 
         <div class="modal-actions">
           <button type="button" class="btn-secondary modal-cancel">ביטול</button>
-          <button type="submit" class="btn-primary">שמירה</button>
+          <button type="submit" class="btn-primary" id="itemSaveBtn">שמירה</button>
         </div>
       </form>
     </div>
