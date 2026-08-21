@@ -94,11 +94,11 @@ export function getCurrentList() {
   return db.lists[db.currentId] || null;
 }
 
-export function createList(name) {
+export function createList(name, { switchCurrent = true } = {}) {
   const id = makeListId();
   db.lists[id] = { name: name || 'רשימה חדשה', url: '', budget: 0, items: [] };
   db.listsOrder.push(id);
-  db.currentId = id;
+  if (switchCurrent) db.currentId = id;
   save();
   return id;
 }
