@@ -202,6 +202,8 @@ function handleItemsContainerClick(e) {
       },
       anchorRect,
     });
+  } else if (action === 'expand-name') {
+    e.target.closest('.item-name').classList.toggle('expanded');
   } else if (action === 'edit') {
     if (isListLocked()) return;
     openEditItemModal(itemId);
