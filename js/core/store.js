@@ -153,6 +153,17 @@ export function addItem(listId, itemData) {
   return item;
 }
 
+export function insertItem(listId, index, itemData) {
+  const list = db.lists[listId];
+  if (!list) return null;
+  const item = normalizeItem(itemData);
+  const at = Math.max(0, Math.min(index, list.items.length));
+  list.items.splice(at, 0, item);
+  db.pricebook[item.name.toLowerCase().trim()] = { price: item.price, category: item.category };
+  save();
+  return item;
+}
+
 export function editItem(listId, itemId, changes) {
   const list = db.lists[listId];
   if (!list) return;
