@@ -129,23 +129,23 @@
       </div>
       <form id="itemForm">
         <input type="hidden" id="itemFormId">
-        <label for="itemName">שם הפריט</label>
+        <label for="itemName" class="sr-only">שם הפריט</label>
         <div style="position:relative;">
           <div style="display:flex;gap:8px;">
-            <input id="itemName" type="text" required autocomplete="off" style="flex:1;">
+            <input id="itemName" type="text" required autocomplete="off" placeholder="שם הפריט" class="quick-input" style="flex:1;">
             <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול"><i class="ph ph-microphone"></i></button>
           </div>
           <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
         </div>
 
-        <div class="form-row">
+        <div class="form-row quick-form-row">
           <div>
-            <label for="itemPrice">מחיר</label>
-            <input id="itemPrice" type="number" step="0.01" min="0" inputmode="decimal">
+            <label for="itemPrice" class="sr-only">מחיר</label>
+            <input id="itemPrice" type="number" step="0.01" min="0" inputmode="decimal" placeholder="💰 מחיר" class="quick-input">
           </div>
           <div>
-            <label for="itemQty">כמות</label>
-            <input id="itemQty" type="number" step="1" min="1" value="1" inputmode="numeric">
+            <label for="itemQty" class="sr-only">כמות</label>
+            <input id="itemQty" type="number" step="1" min="1" value="1" inputmode="numeric" placeholder="🔢 כמות" class="quick-input">
           </div>
         </div>
 
