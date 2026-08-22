@@ -1,4 +1,4 @@
-const CACHE_NAME = "vplus-v4";
+const CACHE_NAME = "vplus-v5";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
@@ -18,6 +18,7 @@ const PRECACHE_URLS = [
   "./js/features/import.js",
   "./js/features/voice.js",
   "./js/features/organize.js",
+  "./js/features/text-scale.js",
 ];
 
 self.addEventListener("install", (event) => {
