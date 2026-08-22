@@ -436,7 +436,7 @@ label {
   height: 4px;
   border: 1.5px solid var(--color-bg);
   border-top: none;
-  border-inline-end: none;
+  border-right: none;
   transform: rotate(-45deg) translateY(-1px);
 }
 
