@@ -666,15 +666,19 @@ label {
   z-index: 40;
 }
 .toast-bar.toast-item-shape {
-  border: 1.5px solid rgba(239, 68, 68, .25);
-  border-inline-start: 4px solid var(--color-danger);
+  border: none;
   border-radius: 25px;
-  background: rgba(239, 68, 68, .08);
-  box-shadow: var(--shadow-sm);
+  background: #dc2626;
+  box-shadow: var(--shadow-md);
   padding: 13px 14px;
   gap: 11px;
 }
-.toast-item-shape .toast-content { color: var(--color-danger); }
+.toast-item-shape .toast-content { color: #fff; }
+.toast-item-shape .toast-undo-btn {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+}
 
 .toast-content { flex: 1; }
 .toast-undo-btn {
