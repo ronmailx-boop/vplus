@@ -1,4 +1,4 @@
-import { db, getCurrentList, createList, addItem, editItem, deleteItem, toggleItemChecked, save } from '../core/store.js';
+import { db, getCurrentList, createList, addItem, insertItem, editItem, deleteItem, toggleItemChecked, save } from '../core/store.js';
 import { CATEGORIES } from '../core/constants.js';
 import { openModal, closeModal, showToast } from '../ui/modals.js';
 import { render } from '../ui/render.js';
@@ -189,14 +189,14 @@ function handleItemsContainerClick(e) {
   } else if (action === 'delete') {
     if (isListLocked()) return;
     const list = getCurrentList();
-    const item = list.items.find((i) => i.id === itemId);
-    const snapshot = { ...item };
+    const snapshotIndex = list.items.findIndex((i) => i.id === itemId);
+    const snapshot = { ...list.items[snapshotIndex] };
     deleteItem(db.currentId, itemId);
     render();
     showToast(`"${snapshot.name}" נמחק`, {
       undoLabel: 'בטל',
       onUndo: () => {
-        addItem(db.currentId, snapshot);
+        insertItem(db.currentId, snapshotIndex, snapshot);
         render();
       },
     });
