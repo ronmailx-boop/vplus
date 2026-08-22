@@ -8,7 +8,7 @@ export function closeModal(id) {
 
 let toastTimer = null;
 
-export function showToast(text, { undoLabel = null, onUndo = null } = {}) {
+export function showToast(text, { undoLabel = null, onUndo = null, anchorRect = null } = {}) {
   const bar = document.getElementById('toastBar');
   const content = document.getElementById('toastContent');
   const undoBtn = document.getElementById('toastUndoBtn');
@@ -16,6 +16,24 @@ export function showToast(text, { undoLabel = null, onUndo = null } = {}) {
 
   content.textContent = text;
   clearTimeout(toastTimer);
+
+  if (anchorRect) {
+    bar.style.top = `${anchorRect.top}px`;
+    bar.style.left = `${anchorRect.left}px`;
+    bar.style.width = `${anchorRect.width}px`;
+    bar.style.right = 'auto';
+    bar.style.bottom = 'auto';
+    bar.style.maxWidth = 'none';
+    bar.style.margin = '0';
+  } else {
+    bar.style.top = '';
+    bar.style.left = '';
+    bar.style.width = '';
+    bar.style.right = '';
+    bar.style.bottom = '';
+    bar.style.maxWidth = '';
+    bar.style.margin = '';
+  }
 
   if (undoLabel && onUndo) {
     undoBtn.textContent = undoLabel;
