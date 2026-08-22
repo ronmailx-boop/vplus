@@ -201,6 +201,8 @@ function handleItemsContainerClick(e) {
         render();
       },
       anchorRect,
+      itemShaped: true,
+      accentColor: CATEGORIES[snapshot.category] || CATEGORIES['אחר'],
     });
   } else if (action === 'expand-name') {
     e.target.closest('.item-name').classList.toggle('expanded');

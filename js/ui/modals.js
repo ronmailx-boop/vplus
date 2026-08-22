@@ -8,7 +8,7 @@ export function closeModal(id) {
 
 let toastTimer = null;
 
-export function showToast(text, { undoLabel = null, onUndo = null, anchorRect = null } = {}) {
+export function showToast(text, { undoLabel = null, onUndo = null, anchorRect = null, itemShaped = false, accentColor = null } = {}) {
   const bar = document.getElementById('toastBar');
   const content = document.getElementById('toastContent');
   const undoBtn = document.getElementById('toastUndoBtn');
@@ -34,6 +34,10 @@ export function showToast(text, { undoLabel = null, onUndo = null, anchorRect = 
     bar.style.maxWidth = '';
     bar.style.margin = '';
   }
+
+  bar.classList.toggle('toast-item-shape', itemShaped);
+  if (itemShaped && accentColor) bar.style.setProperty('--cat', accentColor);
+  else bar.style.removeProperty('--cat');
 
   if (undoLabel && onUndo) {
     undoBtn.textContent = undoLabel;

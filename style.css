@@ -665,6 +665,16 @@ label {
   font-size: 0.71875rem;
   z-index: 40;
 }
+.toast-bar.toast-item-shape {
+  border: none;
+  border-inline-start: 4px solid var(--cat, transparent);
+  border-radius: 25px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  padding: 13px 14px;
+  gap: 11px;
+}
+
 .toast-content { flex: 1; }
 .toast-undo-btn {
   border: none;
