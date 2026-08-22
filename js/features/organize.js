@@ -7,7 +7,6 @@ import {
   selectedListIds,
   setItemEditMode,
   setListEditMode,
-  setActivePage,
 } from '../ui/render.js';
 import { showToast, confirmDialog } from '../ui/modals.js';
 
@@ -81,6 +80,17 @@ function handleLockToggle() {
   render();
 }
 
+function handleToggleTotalsBar() {
+  const bar = document.getElementById('listTotalsBar');
+  const btn = document.getElementById('openStatsShortcutBtn');
+  const open = bar.classList.toggle('hidden') === false;
+  btn.classList.toggle('active', open);
+  btn.textContent = open ? '✕ הסתר סכום' : '📊 הצג סכום';
+  const label = open ? 'הסתר סכום' : 'הצג סכום';
+  btn.setAttribute('aria-label', label);
+  btn.setAttribute('title', label);
+}
+
 function handlePrint() {
   window.print();
 }
@@ -90,7 +100,7 @@ export function initOrganize() {
 
   document.getElementById('itemEditModeBtn').addEventListener('click', () => setItemEditMode(!itemEditMode));
   document.getElementById('listEditModeBtn').addEventListener('click', () => setListEditMode(!listEditMode));
-  document.getElementById('openStatsShortcutBtn').addEventListener('click', () => setActivePage('stats'));
+  document.getElementById('openStatsShortcutBtn').addEventListener('click', handleToggleTotalsBar);
   document.getElementById('openDeleteShortcutBtn').addEventListener('click', () => setItemEditMode(true));
   document.getElementById('bulkDeleteCancelBtn').addEventListener('click', () => setItemEditMode(false));
   document.getElementById('bulkDeleteListsCancelBtn').addEventListener('click', () => setListEditMode(false));
