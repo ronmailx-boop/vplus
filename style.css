@@ -103,13 +103,7 @@ body {
   letter-spacing: .02em;
   direction: ltr;
 }
-.logo-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  vertical-align: middle;
-  margin-inline-end: 4px;
-}
+.logo-v { color: #22c55e; }
 .logo-plus { color: #4f46e5; }
 .logo-pro { font-size: 0.5625rem; color: #9055ff; vertical-align: super; font-weight: 800; }
 
