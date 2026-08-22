@@ -8,6 +8,7 @@ import { initAutocomplete, initMacheron } from './features/autocomplete.js';
 import { initImport } from './features/import.js';
 import { initVoiceInput } from './features/voice.js';
 import { initOrganize } from './features/organize.js';
+import { initTextScale } from './features/text-scale.js';
 
 function initNavTabs() {
   document.querySelectorAll('.tab-btn[data-page]').forEach((btn) => {
@@ -74,6 +75,7 @@ initMacheron();
 initImport();
 initVoiceInput();
 initOrganize();
+initTextScale();
 render();
 handleShortcutParams();
 
