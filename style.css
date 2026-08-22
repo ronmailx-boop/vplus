@@ -38,8 +38,8 @@
   --gray-light: var(--color-neutral-800);
   --primary: var(--color-accent);
 
-  --font-heading: "Assistant", "Inter", system-ui, sans-serif;
-  --font-body: "Assistant", "Inter", system-ui, sans-serif;
+  --font-heading: "Secular One", "Assistant", system-ui, sans-serif;
+  --font-body: "Secular One", "Assistant", system-ui, sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 8px;
