@@ -676,6 +676,11 @@ label {
 }
 .modal-card::-webkit-scrollbar { display: none; }
 
+#itemModal .modal-card {
+  max-height: min(335px, 88vh);
+  max-height: min(335px, 88dvh);
+}
+
 .modal-card h2 {
   margin: 0 0 14px;
   font: 500 1.0625rem var(--font-heading);
