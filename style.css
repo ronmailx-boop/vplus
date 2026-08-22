@@ -80,8 +80,8 @@ body {
 #app {
   max-width: 430px;
   margin: 0 auto;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -971,4 +971,6 @@ label[for="itemName"] { margin-top: 4px; }
   .app-header, .tab-bar, .toolbar-row, .pill-row, .list-search-bar,
   .list-totals-bar, .toast-bar, .item-actions, .modal-backdrop { display: none !important; }
   html, body { background: #fff; color: #111; }
+  #app { height: auto; }
+  .page { overflow: visible; height: auto; }
 }
