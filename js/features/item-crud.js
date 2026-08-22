@@ -191,6 +191,7 @@ function handleItemsContainerClick(e) {
     const list = getCurrentList();
     const snapshotIndex = list.items.findIndex((i) => i.id === itemId);
     const snapshot = { ...list.items[snapshotIndex] };
+    const anchorRect = card.getBoundingClientRect();
     deleteItem(db.currentId, itemId);
     render();
     showToast(`"${snapshot.name}" נמחק`, {
@@ -199,6 +200,7 @@ function handleItemsContainerClick(e) {
         insertItem(db.currentId, snapshotIndex, snapshot);
         render();
       },
+      anchorRect,
     });
   } else if (action === 'edit') {
     if (isListLocked()) return;
