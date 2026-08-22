@@ -666,14 +666,15 @@ label {
   z-index: 40;
 }
 .toast-bar.toast-item-shape {
-  border: none;
-  border-inline-start: 4px solid var(--cat, transparent);
+  border: 1.5px solid rgba(239, 68, 68, .25);
+  border-inline-start: 4px solid var(--color-danger);
   border-radius: 25px;
-  background: var(--color-surface);
+  background: rgba(239, 68, 68, .08);
   box-shadow: var(--shadow-sm);
   padding: 13px 14px;
   gap: 11px;
 }
+.toast-item-shape .toast-content { color: var(--color-danger); }
 
 .toast-content { flex: 1; }
 .toast-undo-btn {
