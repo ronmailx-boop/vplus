@@ -9,6 +9,7 @@ import { initImport } from './features/import.js';
 import { initVoiceInput } from './features/voice.js';
 import { initOrganize } from './features/organize.js';
 import { initTextScale } from './features/text-scale.js';
+import { initShare } from './features/share.js';
 
 function initNavTabs() {
   document.querySelectorAll('.tab-btn[data-page]').forEach((btn) => {
@@ -76,6 +77,7 @@ initImport();
 initVoiceInput();
 initOrganize();
 initTextScale();
+initShare();
 render();
 handleShortcutParams();
 
