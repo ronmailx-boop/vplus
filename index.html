@@ -61,6 +61,7 @@
       <div class="pill-row">
         <button id="itemEditModeBtn" class="pill pill-purple" aria-label="מצב עריכה וסידור" title="מצב עריכה וסידור">✏️ סדר מוצרים</button>
         <button id="shareListBtn" class="pill pill-purple" aria-label="שתף רשימה" title="שתף רשימה"><i class="ph ph-share"></i></button>
+        <button id="liveShareBtn" class="pill pill-purple" aria-label="שיתוף חי בין כמה אנשים" title="שיתוף חי"><i class="ph ph-users-three"></i></button>
         <button id="openStatsShortcutBtn" class="pill pill-purple" aria-label="הצג סכום" title="הצג סכום">📊 הצג סכום</button>
         <button id="openDeleteShortcutBtn" class="pill pill-red" aria-label="מחק פריטים" title="מחק">🗑️ מחק</button>
       </div>
@@ -202,6 +203,25 @@
           <button type="submit" class="btn-primary">שמירה</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Live share (multi-user) modal -->
+  <div id="liveShareModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>שיתוף רשימה חי</h2>
+      <p>הפכו את הרשימה למשותפת — כל מי שיש לו את הקישור יראה אותה ויוכל לעדכן אותה, בזמן אמת.</p>
+      <div id="liveShareLinkWrap" class="hidden">
+        <label for="liveShareLinkInput" class="sr-only">קישור שיתוף</label>
+        <input id="liveShareLinkInput" type="text" readonly>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="liveShareEnableBtn" class="btn-primary">הפוך לרשימה משותפת</button>
+        <button type="button" id="liveShareSendBtn" class="btn-primary hidden">שתף קישור</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary modal-cancel">סגירה</button>
+      </div>
     </div>
   </div>
 

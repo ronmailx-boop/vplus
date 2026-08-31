@@ -55,11 +55,18 @@ function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+const postRenderHooks = [];
+
+export function onRender(fn) {
+  postRenderHooks.push(fn);
+}
+
 export function render() {
   renderListNameBar();
   if (activePage === 'lists') renderItemsPage();
   else if (activePage === 'summary') renderSummaryPage();
   else if (activePage === 'stats') renderStatsPage();
+  postRenderHooks.forEach((fn) => fn());
 }
 
 function renderListNameBar() {
