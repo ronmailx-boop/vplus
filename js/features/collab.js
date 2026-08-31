@@ -3,9 +3,13 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../core/supabase-config.js';
 import { render, onRender } from '../ui/render.js';
 import { openModal, showToast } from '../ui/modals.js';
 
+const POLL_INTERVAL_MS = 4000;
+
 let supabaseClient = null;
 let channel = null;
 let pushTimer = null;
+let pollTimer = null;
+let lastKnownUpdatedAt = null;
 
 async function getClient() {
   if (supabaseClient) return supabaseClient;
@@ -18,7 +22,46 @@ function findListByShareId(shareId) {
   return Object.keys(db.lists).find((id) => db.lists[id].shareId === shareId) || null;
 }
 
+function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
+  const listId = findListByShareId(shareId);
+  if (!listId) return;
+  db.lists[listId] = { ...remoteData, shareId };
+  lastKnownUpdatedAt = remoteUpdatedAt || lastKnownUpdatedAt;
+  save();
+  if (db.currentId === listId) render();
+}
+
+function stopPolling() {
+  clearInterval(pollTimer);
+  pollTimer = null;
+}
+
+function startPolling(shareId) {
+  stopPolling();
+  pollTimer = setInterval(async () => {
+    if (!findListByShareId(shareId)) {
+      stopPolling();
+      return;
+    }
+    try {
+      const client = await getClient();
+      const { data, error } = await client
+        .from('shared_lists')
+        .select('data,updated_at')
+        .eq('id', shareId)
+        .single();
+      if (error || !data) return;
+      if (data.updated_at !== lastKnownUpdatedAt) {
+        applyRemoteUpdate(shareId, data.data, data.updated_at);
+      }
+    } catch {
+      /* silent — the next poll tick or the realtime channel will retry */
+    }
+  }, POLL_INTERVAL_MS);
+}
+
 async function subscribeToList(shareId) {
+  startPolling(shareId);
   try {
     const client = await getClient();
     if (channel) {
@@ -31,16 +74,12 @@ async function subscribeToList(shareId) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'shared_lists', filter: `id=eq.${shareId}` },
         (payload) => {
-          const listId = findListByShareId(shareId);
-          if (!listId) return;
-          db.lists[listId] = { ...payload.new.data, shareId };
-          save();
-          if (db.currentId === listId) render();
+          applyRemoteUpdate(shareId, payload.new.data, payload.new.updated_at);
         }
       )
       .subscribe();
   } catch {
-    showToast('לא ניתן להתחבר לעדכונים חיים — בדקו חיבור לרשת');
+    /* the polling fallback started above still keeps the list in sync */
   }
 }
 
@@ -59,10 +98,15 @@ export async function enableSharing(listId) {
 
   try {
     const client = await getClient();
-    const { data, error } = await client.from('shared_lists').insert({ data: list }).select('id').single();
+    const { data, error } = await client
+      .from('shared_lists')
+      .insert({ data: list })
+      .select('id,updated_at')
+      .single();
     if (error || !data) throw error || new Error('no data');
 
     list.shareId = data.id;
+    lastKnownUpdatedAt = data.updated_at;
     save();
     subscribeToList(list.shareId);
     return list.shareId;
@@ -75,7 +119,11 @@ export async function enableSharing(listId) {
 export async function joinSharedList(shareId) {
   try {
     const client = await getClient();
-    const { data, error } = await client.from('shared_lists').select('data').eq('id', shareId).single();
+    const { data, error } = await client
+      .from('shared_lists')
+      .select('data,updated_at')
+      .eq('id', shareId)
+      .single();
     if (error || !data) throw error || new Error('no data');
 
     let listId = findListByShareId(shareId);
@@ -85,6 +133,7 @@ export async function joinSharedList(shareId) {
     }
     db.lists[listId] = { ...data.data, shareId };
     db.currentId = listId;
+    lastKnownUpdatedAt = data.updated_at;
     save();
     subscribeToList(shareId);
     render();
@@ -99,12 +148,15 @@ function pushCurrentListIfShared() {
   clearTimeout(pushTimer);
   const shareId = list.shareId;
   pushTimer = setTimeout(async () => {
+    const updatedAt = new Date().toISOString();
     try {
       const client = await getClient();
-      await client
+      const { error } = await client
         .from('shared_lists')
-        .update({ data: list, updated_at: new Date().toISOString() })
+        .update({ data: list, updated_at: updatedAt })
         .eq('id', shareId);
+      if (error) throw error;
+      lastKnownUpdatedAt = updatedAt;
     } catch {
       showToast('לא ניתן לעדכן את הרשימה המשותפת — בדקו חיבור לרשת');
     }
@@ -167,6 +219,12 @@ function handleLinkInputFocus(e) {
   e.target.select();
 }
 
+function handleVisibilityChange() {
+  if (document.visibilityState !== 'visible') return;
+  const current = getCurrentList();
+  if (current?.shareId) subscribeToList(current.shareId);
+}
+
 export function initCollab() {
   document.getElementById('liveShareBtn').addEventListener('click', () => {
     refreshLiveShareModal();
@@ -175,6 +233,7 @@ export function initCollab() {
   document.getElementById('liveShareEnableBtn').addEventListener('click', handleEnableClick);
   document.getElementById('liveShareSendBtn').addEventListener('click', handleSendClick);
   document.getElementById('liveShareLinkInput').addEventListener('focus', handleLinkInputFocus);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 
   onRender(pushCurrentListIfShared);
 
