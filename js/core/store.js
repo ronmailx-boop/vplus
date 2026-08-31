@@ -1,6 +1,6 @@
 import { STORAGE_KEY, detectCategory } from './constants.js';
 
-function makeListId() {
+export function makeListId() {
   return 'L' + Date.now();
 }
 

@@ -1,0 +1,189 @@
+import { db, getCurrentList, makeListId, save } from '../core/store.js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../core/supabase-config.js';
+import { render, onRender } from '../ui/render.js';
+import { openModal, showToast } from '../ui/modals.js';
+
+let supabaseClient = null;
+let channel = null;
+let pushTimer = null;
+
+async function getClient() {
+  if (supabaseClient) return supabaseClient;
+  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return supabaseClient;
+}
+
+function findListByShareId(shareId) {
+  return Object.keys(db.lists).find((id) => db.lists[id].shareId === shareId) || null;
+}
+
+async function subscribeToList(shareId) {
+  try {
+    const client = await getClient();
+    if (channel) {
+      client.removeChannel(channel);
+      channel = null;
+    }
+    channel = client
+      .channel('shared_lists:' + shareId)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'shared_lists', filter: `id=eq.${shareId}` },
+        (payload) => {
+          const listId = findListByShareId(shareId);
+          if (!listId) return;
+          db.lists[listId] = { ...payload.new.data, shareId };
+          save();
+          if (db.currentId === listId) render();
+        }
+      )
+      .subscribe();
+  } catch {
+    showToast('לא ניתן להתחבר לעדכונים חיים — בדקו חיבור לרשת');
+  }
+}
+
+export function getShareLink(shareId) {
+  const url = new URL(location.href);
+  url.hash = '';
+  url.search = '';
+  url.searchParams.set('share', shareId);
+  return url.toString();
+}
+
+export async function enableSharing(listId) {
+  const list = db.lists[listId];
+  if (!list) return null;
+  if (list.shareId) return list.shareId;
+
+  try {
+    const client = await getClient();
+    const { data, error } = await client.from('shared_lists').insert({ data: list }).select('id').single();
+    if (error || !data) throw error || new Error('no data');
+
+    list.shareId = data.id;
+    save();
+    subscribeToList(list.shareId);
+    return list.shareId;
+  } catch {
+    showToast('שגיאה בהפעלת שיתוף — בדקו חיבור לרשת ונסו שוב');
+    return null;
+  }
+}
+
+export async function joinSharedList(shareId) {
+  try {
+    const client = await getClient();
+    const { data, error } = await client.from('shared_lists').select('data').eq('id', shareId).single();
+    if (error || !data) throw error || new Error('no data');
+
+    let listId = findListByShareId(shareId);
+    if (!listId) {
+      listId = makeListId();
+      db.listsOrder.push(listId);
+    }
+    db.lists[listId] = { ...data.data, shareId };
+    db.currentId = listId;
+    save();
+    subscribeToList(shareId);
+    render();
+  } catch {
+    showToast('לא ניתן לטעון את הרשימה המשותפת — בדקו חיבור לרשת');
+  }
+}
+
+function pushCurrentListIfShared() {
+  const list = getCurrentList();
+  if (!list || !list.shareId) return;
+  clearTimeout(pushTimer);
+  const shareId = list.shareId;
+  pushTimer = setTimeout(async () => {
+    try {
+      const client = await getClient();
+      await client
+        .from('shared_lists')
+        .update({ data: list, updated_at: new Date().toISOString() })
+        .eq('id', shareId);
+    } catch {
+      showToast('לא ניתן לעדכן את הרשימה המשותפת — בדקו חיבור לרשת');
+    }
+  }, 600);
+}
+
+function refreshLiveShareModal() {
+  const list = getCurrentList();
+  const linkWrap = document.getElementById('liveShareLinkWrap');
+  const linkInput = document.getElementById('liveShareLinkInput');
+  const enableBtn = document.getElementById('liveShareEnableBtn');
+  const sendBtn = document.getElementById('liveShareSendBtn');
+
+  if (list?.shareId) {
+    linkInput.value = getShareLink(list.shareId);
+    linkWrap.classList.remove('hidden');
+    enableBtn.classList.add('hidden');
+    sendBtn.classList.remove('hidden');
+  } else {
+    linkWrap.classList.add('hidden');
+    enableBtn.classList.remove('hidden');
+    sendBtn.classList.add('hidden');
+  }
+}
+
+async function handleEnableClick() {
+  const list = getCurrentList();
+  if (!list) return;
+  const enableBtn = document.getElementById('liveShareEnableBtn');
+  enableBtn.disabled = true;
+  try {
+    await enableSharing(db.currentId);
+  } finally {
+    enableBtn.disabled = false;
+    refreshLiveShareModal();
+  }
+}
+
+async function handleSendClick() {
+  const list = getCurrentList();
+  if (!list?.shareId) return;
+  const link = getShareLink(list.shareId);
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: `Vplus - ${list.name}`, url: link });
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('השיתוף נכשל');
+    }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(link);
+    showToast('הקישור הועתק ללוח');
+  } catch {
+    showToast('לא ניתן להעתיק ללוח');
+  }
+}
+
+function handleLinkInputFocus(e) {
+  e.target.select();
+}
+
+export function initCollab() {
+  document.getElementById('liveShareBtn').addEventListener('click', () => {
+    refreshLiveShareModal();
+    openModal('liveShareModal');
+  });
+  document.getElementById('liveShareEnableBtn').addEventListener('click', handleEnableClick);
+  document.getElementById('liveShareSendBtn').addEventListener('click', handleSendClick);
+  document.getElementById('liveShareLinkInput').addEventListener('focus', handleLinkInputFocus);
+
+  onRender(pushCurrentListIfShared);
+
+  const params = new URLSearchParams(location.search);
+  const shareId = params.get('share');
+  if (shareId) {
+    joinSharedList(shareId);
+  } else {
+    const current = getCurrentList();
+    if (current?.shareId) subscribeToList(current.shareId);
+  }
+}

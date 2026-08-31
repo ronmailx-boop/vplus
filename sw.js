@@ -1,4 +1,4 @@
-const CACHE_NAME = "vplus-v6";
+const CACHE_NAME = "vplus-v7";
 const PRECACHE_URLS = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const PRECACHE_URLS = [
   "./js/core/store.js",
   "./js/core/constants.js",
   "./js/core/utils.js",
+  "./js/core/supabase-config.js",
   "./js/ui/render.js",
   "./js/ui/modals.js",
   "./js/features/item-crud.js",
@@ -20,6 +21,7 @@ const PRECACHE_URLS = [
   "./js/features/organize.js",
   "./js/features/text-scale.js",
   "./js/features/share.js",
+  "./js/features/collab.js",
 ];
 
 self.addEventListener("install", (event) => {
