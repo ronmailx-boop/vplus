@@ -23,6 +23,9 @@ function findListByShareId(shareId) {
 }
 
 function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
+  if (remoteUpdatedAt && lastKnownUpdatedAt && new Date(remoteUpdatedAt) <= new Date(lastKnownUpdatedAt)) {
+    return; // stale or duplicate (self-echo, or a slow poll response overtaken by a newer update) — ignore
+  }
   const listId = findListByShareId(shareId);
   if (!listId) return;
   db.lists[listId] = { ...remoteData, shareId };
