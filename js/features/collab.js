@@ -4,12 +4,16 @@ import { render, onRender } from '../ui/render.js';
 import { openModal, showToast } from '../ui/modals.js';
 
 const POLL_INTERVAL_MS = 4000;
+const TYPING_PING_THROTTLE_MS = 2000;
+const TYPING_INDICATOR_HIDE_MS = 3500;
 
 let supabaseClient = null;
 let channel = null;
 let pushTimer = null;
 let pollTimer = null;
 let lastKnownUpdatedAt = null;
+let lastTypingPingAt = 0;
+let typingHideTimer = null;
 
 async function getClient() {
   if (supabaseClient) return supabaseClient;
@@ -73,6 +77,16 @@ function startPolling(shareId) {
   }, POLL_INTERVAL_MS);
 }
 
+function showTypingIndicator() {
+  const indicator = document.getElementById('typingIndicator');
+  if (!indicator) return;
+  indicator.classList.remove('hidden');
+  clearTimeout(typingHideTimer);
+  typingHideTimer = setTimeout(() => {
+    indicator.classList.add('hidden');
+  }, TYPING_INDICATOR_HIDE_MS);
+}
+
 async function subscribeToList(shareId) {
   startPolling(shareId);
   try {
@@ -90,9 +104,23 @@ async function subscribeToList(shareId) {
           applyRemoteUpdate(shareId, payload.new.data, payload.new.updated_at);
         }
       )
+      .on('broadcast', { event: 'typing' }, () => showTypingIndicator())
       .subscribe();
   } catch {
     /* the polling fallback started above still keeps the list in sync */
+  }
+}
+
+function sendTypingPing() {
+  const list = getCurrentList();
+  if (!list?.shareId || !channel) return;
+  const now = Date.now();
+  if (now - lastTypingPingAt < TYPING_PING_THROTTLE_MS) return;
+  lastTypingPingAt = now;
+  try {
+    channel.send({ type: 'broadcast', event: 'typing', payload: {} });
+  } catch {
+    /* best-effort cosmetic ping — a failed send just means the other side won't see the indicator this time */
   }
 }
 
@@ -247,6 +275,7 @@ export function initCollab() {
   document.getElementById('liveShareSendBtn').addEventListener('click', handleSendClick);
   document.getElementById('liveShareLinkInput').addEventListener('focus', handleLinkInputFocus);
   document.addEventListener('visibilitychange', handleVisibilityChange);
+  document.getElementById('itemName').addEventListener('input', sendTypingPing);
 
   onRender(pushCurrentListIfShared);
 
