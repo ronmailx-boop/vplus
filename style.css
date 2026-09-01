@@ -107,6 +107,14 @@ body {
 .logo-plus { color: #4f46e5; }
 .logo-pro { font-size: 0.5625rem; color: #9055ff; vertical-align: super; font-weight: 800; }
 
+.app-version {
+  font: 400 0.5625rem var(--font-body);
+  letter-spacing: normal;
+  direction: rtl;
+  color: var(--color-neutral-400);
+  margin-top: 2px;
+}
+
 /* — list name bar (name + count + icon actions) — */
 
 .list-name-bar {
