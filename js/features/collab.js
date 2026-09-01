@@ -22,13 +22,23 @@ function findListByShareId(shareId) {
   return Object.keys(db.lists).find((id) => db.lists[id].shareId === shareId) || null;
 }
 
+function mergeItems(localItems, remoteItems) {
+  const byId = new Map(remoteItems.map((item) => [item.id, item]));
+  localItems.forEach((item) => {
+    if (!byId.has(item.id)) byId.set(item.id, item);
+  });
+  return Array.from(byId.values());
+}
+
 function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
   if (remoteUpdatedAt && lastKnownUpdatedAt && new Date(remoteUpdatedAt) <= new Date(lastKnownUpdatedAt)) {
     return; // stale or duplicate (self-echo, or a slow poll response overtaken by a newer update) — ignore
   }
   const listId = findListByShareId(shareId);
   if (!listId) return;
-  db.lists[listId] = { ...remoteData, shareId };
+  const localList = db.lists[listId];
+  const items = localList ? mergeItems(localList.items, remoteData.items) : remoteData.items;
+  db.lists[listId] = { ...remoteData, items, shareId };
   lastKnownUpdatedAt = remoteUpdatedAt || lastKnownUpdatedAt;
   save();
   if (db.currentId === listId) render();
