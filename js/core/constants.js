@@ -277,4 +277,4 @@ export function detectCategory(productName) {
 
 export const APP_NAME = 'vplus';
 export const STORAGE_KEY = 'vplus_db_v1';
-export const APP_VERSION = 49;
+export const APP_VERSION = 50;
