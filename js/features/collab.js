@@ -14,6 +14,7 @@ let pollTimer = null;
 let lastKnownUpdatedAt = null;
 let lastTypingPingAt = 0;
 let typingHideTimer = null;
+let suppressNextPush = false;
 
 async function getClient() {
   if (supabaseClient) return supabaseClient;
@@ -34,53 +35,27 @@ function mergeItems(localItems, remoteItems) {
   return Array.from(byId.values());
 }
 
-function sortedById(items) {
-  return [...items].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-}
-
-// Postgres/jsonb does not guarantee object key order is preserved across a round-trip,
-// so a raw JSON.stringify comparison of round-tripped data can report "different" for
-// identical content — sort keys recursively first to make the comparison order-independent.
-function canonicalize(value) {
-  if (Array.isArray(value)) return value.map(canonicalize);
-  if (value && typeof value === 'object') {
-    return Object.keys(value).sort().reduce((acc, key) => {
-      acc[key] = canonicalize(value[key]);
-      return acc;
-    }, {});
-  }
-  return value;
-}
-
-function sameListContent(a, b) {
-  if (a.name !== b.name || a.budget !== b.budget || a.url !== b.url) return false;
-  if (a.items.length !== b.items.length) return false;
-  return JSON.stringify(sortedById(a.items).map(canonicalize)) === JSON.stringify(sortedById(b.items).map(canonicalize));
-}
-
+// No more comparing timestamps-as-strings or content-as-JSON: Postgres round-trips those in
+// ways JS string/JSON.stringify equality can't rely on (different timestamp string, reordered
+// jsonb keys), and that broke self-echo/no-op detection twice already (stages 52, 53). Instead:
+// always merge and always render (cheap and idempotent), and decide whether to push back up
+// purely by whether the merge actually pulled in a local-only item the remote didn't have —
+// a plain array-length comparison, immune to any text/formatting differences from the server.
 function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
-  // An exact match to the timestamp we already know is a genuine self-echo (or a duplicate
-  // notification of the same write) — safe to skip entirely. Anything else, even an "older"
-  // timestamp, may carry a concurrent branch's item we never merged in yet, so it must still
-  // be merged (see stage 52) — union-merge below can only add items, never drop ones we have.
-  // Compare actual instants (not raw strings): Postgres/PostgREST commonly returns timestamptz
-  // as "...+00:00" while we sent "...Z" — same instant, different string.
-  const isSelfEcho = remoteUpdatedAt && lastKnownUpdatedAt &&
-    new Date(remoteUpdatedAt).getTime() === new Date(lastKnownUpdatedAt).getTime();
-  if (remoteUpdatedAt && (!lastKnownUpdatedAt || new Date(remoteUpdatedAt) > new Date(lastKnownUpdatedAt))) {
-    lastKnownUpdatedAt = remoteUpdatedAt;
-  }
-  if (isSelfEcho) return;
+  lastKnownUpdatedAt = remoteUpdatedAt || lastKnownUpdatedAt;
 
   const listId = findListByShareId(shareId);
   if (!listId) return;
   const localList = db.lists[listId];
   const items = localList ? mergeItems(localList.items, remoteData.items) : remoteData.items;
-  const merged = { ...remoteData, items, shareId };
-  if (localList && sameListContent(localList, merged)) return; // nothing actually new — avoid a needless render/push cycle
-  db.lists[listId] = merged;
+  const healedLocalOnlyItems = items.length > remoteData.items.length;
+  db.lists[listId] = { ...remoteData, items, shareId };
   save();
-  if (db.currentId === listId) render();
+  if (db.currentId === listId) {
+    // This remote update already reflects everything we merged in — nothing to push back.
+    if (!healedLocalOnlyItems) suppressNextPush = true;
+    render();
+  }
 }
 
 function stopPolling() {
@@ -103,9 +78,7 @@ function startPolling(shareId) {
         .eq('id', shareId)
         .single();
       if (error || !data) return;
-      if (data.updated_at !== lastKnownUpdatedAt) {
-        applyRemoteUpdate(shareId, data.data, data.updated_at);
-      }
+      applyRemoteUpdate(shareId, data.data, data.updated_at);
     } catch {
       /* silent — the next poll tick or the realtime channel will retry */
     }
@@ -219,6 +192,10 @@ export async function joinSharedList(shareId) {
 }
 
 function pushCurrentListIfShared() {
+  if (suppressNextPush) {
+    suppressNextPush = false;
+    return;
+  }
   const list = getCurrentList();
   if (!list || !list.shareId) return;
   clearTimeout(pushTimer);
