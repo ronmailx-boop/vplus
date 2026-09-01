@@ -34,16 +34,34 @@ function mergeItems(localItems, remoteItems) {
   return Array.from(byId.values());
 }
 
+function sortedById(items) {
+  return [...items].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+}
+
+function sameListContent(a, b) {
+  if (a.name !== b.name || a.budget !== b.budget || a.url !== b.url) return false;
+  if (a.items.length !== b.items.length) return false;
+  return JSON.stringify(sortedById(a.items)) === JSON.stringify(sortedById(b.items));
+}
+
 function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
-  if (remoteUpdatedAt && lastKnownUpdatedAt && new Date(remoteUpdatedAt) <= new Date(lastKnownUpdatedAt)) {
-    return; // stale or duplicate (self-echo, or a slow poll response overtaken by a newer update) — ignore
+  // An exact match to the timestamp we already know is a genuine self-echo (or a duplicate
+  // notification of the same write) — safe to skip entirely. Anything else, even an "older"
+  // timestamp, may carry a concurrent branch's item we never merged in yet, so it must still
+  // be merged (see stage 52) — union-merge below can only add items, never drop ones we have.
+  const isSelfEcho = remoteUpdatedAt && lastKnownUpdatedAt && remoteUpdatedAt === lastKnownUpdatedAt;
+  if (remoteUpdatedAt && (!lastKnownUpdatedAt || new Date(remoteUpdatedAt) > new Date(lastKnownUpdatedAt))) {
+    lastKnownUpdatedAt = remoteUpdatedAt;
   }
+  if (isSelfEcho) return;
+
   const listId = findListByShareId(shareId);
   if (!listId) return;
   const localList = db.lists[listId];
   const items = localList ? mergeItems(localList.items, remoteData.items) : remoteData.items;
-  db.lists[listId] = { ...remoteData, items, shareId };
-  lastKnownUpdatedAt = remoteUpdatedAt || lastKnownUpdatedAt;
+  const merged = { ...remoteData, items, shareId };
+  if (localList && sameListContent(localList, merged)) return; // nothing actually new — avoid a needless render/push cycle
+  db.lists[listId] = merged;
   save();
   if (db.currentId === listId) render();
 }
