@@ -38,10 +38,24 @@ function sortedById(items) {
   return [...items].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
+// Postgres/jsonb does not guarantee object key order is preserved across a round-trip,
+// so a raw JSON.stringify comparison of round-tripped data can report "different" for
+// identical content — sort keys recursively first to make the comparison order-independent.
+function canonicalize(value) {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === 'object') {
+    return Object.keys(value).sort().reduce((acc, key) => {
+      acc[key] = canonicalize(value[key]);
+      return acc;
+    }, {});
+  }
+  return value;
+}
+
 function sameListContent(a, b) {
   if (a.name !== b.name || a.budget !== b.budget || a.url !== b.url) return false;
   if (a.items.length !== b.items.length) return false;
-  return JSON.stringify(sortedById(a.items)) === JSON.stringify(sortedById(b.items));
+  return JSON.stringify(sortedById(a.items).map(canonicalize)) === JSON.stringify(sortedById(b.items).map(canonicalize));
 }
 
 function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
@@ -49,7 +63,10 @@ function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
   // notification of the same write) — safe to skip entirely. Anything else, even an "older"
   // timestamp, may carry a concurrent branch's item we never merged in yet, so it must still
   // be merged (see stage 52) — union-merge below can only add items, never drop ones we have.
-  const isSelfEcho = remoteUpdatedAt && lastKnownUpdatedAt && remoteUpdatedAt === lastKnownUpdatedAt;
+  // Compare actual instants (not raw strings): Postgres/PostgREST commonly returns timestamptz
+  // as "...+00:00" while we sent "...Z" — same instant, different string.
+  const isSelfEcho = remoteUpdatedAt && lastKnownUpdatedAt &&
+    new Date(remoteUpdatedAt).getTime() === new Date(lastKnownUpdatedAt).getTime();
   if (remoteUpdatedAt && (!lastKnownUpdatedAt || new Date(remoteUpdatedAt) > new Date(lastKnownUpdatedAt))) {
     lastKnownUpdatedAt = remoteUpdatedAt;
   }
