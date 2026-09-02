@@ -15,6 +15,7 @@ let lastKnownUpdatedAt = null;
 let lastTypingPingAt = 0;
 let typingHideTimer = null;
 let suppressNextPush = false;
+let lastSyncedItemIds = null;
 
 async function getClient() {
   if (supabaseClient) return supabaseClient;
@@ -27,10 +28,16 @@ function findListByShareId(shareId) {
   return Object.keys(db.lists).find((id) => db.lists[id].shareId === shareId) || null;
 }
 
-function mergeItems(localItems, remoteItems) {
-  const byId = new Map(remoteItems.map((item) => [item.id, item]));
+// A plain union-by-id merge can only ADD items, never remove one — so a deletion (an item
+// simply missing from one side) always looked identical to "an item I don't know about yet
+// on the other side", and kept getting merged back in forever. deletedIds is a tombstone set
+// (id-only, "only grows" just like items "only join") carried alongside items in the synced
+// payload: any id in it is excluded on both sides, regardless of whether either side still has it.
+function mergeItems(localItems, remoteItems, deletedIds) {
+  const tombstones = new Set(deletedIds || []);
+  const byId = new Map(remoteItems.filter((item) => !tombstones.has(item.id)).map((item) => [item.id, item]));
   localItems.forEach((item) => {
-    if (!byId.has(item.id)) byId.set(item.id, item);
+    if (!tombstones.has(item.id) && !byId.has(item.id)) byId.set(item.id, item);
   });
   return Array.from(byId.values());
 }
@@ -39,21 +46,24 @@ function mergeItems(localItems, remoteItems) {
 // ways JS string/JSON.stringify equality can't rely on (different timestamp string, reordered
 // jsonb keys), and that broke self-echo/no-op detection twice already (stages 52, 53). Instead:
 // always merge and always render (cheap and idempotent), and decide whether to push back up
-// purely by whether the merge actually pulled in a local-only item the remote didn't have —
-// a plain array-length comparison, immune to any text/formatting differences from the server.
+// purely by whether the merge actually pulled in a local-only item or tombstone the remote
+// didn't have — a plain length comparison, immune to any text/formatting differences from the server.
 function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
   lastKnownUpdatedAt = remoteUpdatedAt || lastKnownUpdatedAt;
 
   const listId = findListByShareId(shareId);
   if (!listId) return;
   const localList = db.lists[listId];
-  const items = localList ? mergeItems(localList.items, remoteData.items) : remoteData.items;
-  const healedLocalOnlyItems = items.length > remoteData.items.length;
-  db.lists[listId] = { ...remoteData, items, shareId };
+  const remoteDeletedIds = remoteData.deletedIds || [];
+  const deletedIds = Array.from(new Set([...(localList?.deletedIds || []), ...remoteDeletedIds]));
+  const items = localList ? mergeItems(localList.items, remoteData.items, deletedIds) : remoteData.items;
+  const healedNewInfo = items.length > remoteData.items.length || deletedIds.length > remoteDeletedIds.length;
+  db.lists[listId] = { ...remoteData, items, deletedIds, shareId };
   save();
   if (db.currentId === listId) {
+    lastSyncedItemIds = new Set(items.map((item) => item.id));
     // This remote update already reflects everything we merged in — nothing to push back.
-    if (!healedLocalOnlyItems) suppressNextPush = true;
+    if (!healedNewInfo) suppressNextPush = true;
     render();
   }
 }
@@ -144,6 +154,7 @@ export async function enableSharing(listId) {
   const list = db.lists[listId];
   if (!list) return null;
   if (list.shareId) return list.shareId;
+  list.deletedIds = list.deletedIds || [];
 
   try {
     const client = await getClient();
@@ -156,6 +167,7 @@ export async function enableSharing(listId) {
 
     list.shareId = data.id;
     lastKnownUpdatedAt = data.updated_at;
+    lastSyncedItemIds = new Set(list.items.map((item) => item.id));
     save();
     subscribeToList(list.shareId);
     return list.shareId;
@@ -180,9 +192,10 @@ export async function joinSharedList(shareId) {
       listId = makeListId();
       db.listsOrder.push(listId);
     }
-    db.lists[listId] = { ...data.data, shareId };
+    db.lists[listId] = { ...data.data, deletedIds: data.data.deletedIds || [], shareId };
     db.currentId = listId;
     lastKnownUpdatedAt = data.updated_at;
+    lastSyncedItemIds = new Set(db.lists[listId].items.map((item) => item.id));
     save();
     subscribeToList(shareId);
     render();
@@ -198,6 +211,23 @@ function pushCurrentListIfShared() {
   }
   const list = getCurrentList();
   if (!list || !list.shareId) return;
+
+  // Deletion has no explicit signal here — it's inferred by diffing against the ids we last
+  // knew about. An id that vanished since then was deleted locally (tombstone it); an id that's
+  // back (e.g. the delete-toast's "undo") is un-tombstoned so the restore also propagates.
+  const currentIds = new Set(list.items.map((item) => item.id));
+  if (lastSyncedItemIds) {
+    const tombstones = new Set(list.deletedIds || []);
+    lastSyncedItemIds.forEach((id) => {
+      if (!currentIds.has(id)) tombstones.add(id);
+    });
+    currentIds.forEach((id) => tombstones.delete(id));
+    list.deletedIds = Array.from(tombstones);
+  } else {
+    list.deletedIds = list.deletedIds || [];
+  }
+  lastSyncedItemIds = currentIds;
+
   clearTimeout(pushTimer);
   const shareId = list.shareId;
   pushTimer = setTimeout(async () => {
