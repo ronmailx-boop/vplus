@@ -7,12 +7,20 @@ export function closeModal(id) {
 }
 
 let toastTimer = null;
+let toastHasActiveUndo = false;
 
 export function showToast(text, { undoLabel = null, onUndo = null, anchorRect = null, itemShaped = false, accentColor = null } = {}) {
   const bar = document.getElementById('toastBar');
   const content = document.getElementById('toastContent');
   const undoBtn = document.getElementById('toastUndoBtn');
   if (!bar || !content || !undoBtn) return;
+
+  const isUndoToast = !!(undoLabel && onUndo);
+  // A toast the user can still undo must not be silently clobbered by an unrelated
+  // background notice (e.g. a transient live-share sync error) landing in the same window —
+  // that notice will surface again on its own (next poll/push), the undo chance won't.
+  if (toastHasActiveUndo && !isUndoToast) return;
+  toastHasActiveUndo = isUndoToast;
 
   content.textContent = text;
   clearTimeout(toastTimer);
@@ -57,6 +65,7 @@ export function showToast(text, { undoLabel = null, onUndo = null, anchorRect = 
 
 export function hideToast() {
   clearTimeout(toastTimer);
+  toastHasActiveUndo = false;
   document.getElementById('toastBar')?.classList.add('hidden');
 }
 
