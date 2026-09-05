@@ -95,10 +95,23 @@ function stepQty(delta) {
   input.value = next;
 }
 
+function updateItemModalScrollHint() {
+  const card = document.getElementById('itemModalCard');
+  const hint = document.getElementById('itemModalScrollHint');
+  const hasMore = card.scrollHeight - card.scrollTop - card.clientHeight > 4;
+  hint.classList.toggle('visible', hasMore);
+}
+
 function setAdvancedFieldsOpen(open) {
   document.getElementById('itemAdvancedFields').classList.toggle('hidden', !open);
   document.getElementById('itemAdvancedToggle').classList.toggle('open', open);
   document.getElementById('itemAdvancedToggleLabel').textContent = open ? 'הצג פחות' : 'עוד אפשרויות';
+  if (open) {
+    document.getElementById('itemAdvancedToggle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    document.getElementById('itemModalCard').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  updateItemModalScrollHint();
 }
 
 function toggleContinuousMode() {
@@ -125,6 +138,7 @@ function openAddItemModal() {
   document.getElementById('itemSaveBtn').textContent = continuousAdd ? 'הוסף + המשך ➜' : 'שמירה';
 
   openModal('itemModal');
+  updateItemModalScrollHint();
   document.getElementById('itemName').focus();
 }
 
@@ -147,6 +161,7 @@ function openEditItemModal(itemId) {
   document.getElementById('contextBar').classList.add('hidden');
 
   openModal('itemModal');
+  updateItemModalScrollHint();
 }
 
 function handleItemFormSubmit(e) {
@@ -234,6 +249,7 @@ export function initItemCrud() {
   });
   document.getElementById('itemQtyMinus').addEventListener('click', () => stepQty(-1));
   document.getElementById('itemQtyPlus').addEventListener('click', () => stepQty(1));
+  document.getElementById('itemModalCard').addEventListener('scroll', updateItemModalScrollHint);
   document.getElementById('itemsContainer').addEventListener('click', handleItemsContainerClick);
 
   document.getElementById('continuousToggle').addEventListener('change', toggleContinuousMode);

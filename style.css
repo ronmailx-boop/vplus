@@ -736,6 +736,22 @@ label {
 }
 .modal-card::-webkit-scrollbar { display: none; }
 
+/* — scroll hint: a soft fade at the bottom of a scrollable modal card,
+     visible only while there's more content below the fold — */
+.modal-scroll-hint {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  margin-top: -28px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--color-surface) 75%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.modal-scroll-hint.visible { opacity: 1; }
+
 #itemModal .modal-card {
   max-height: min(335px, 88vh);
   max-height: min(335px, 88dvh);
