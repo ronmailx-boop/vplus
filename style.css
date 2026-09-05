@@ -746,6 +746,14 @@ label {
   font: 500 1.0625rem var(--font-heading);
 }
 
+.item-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.item-modal-header h2 { margin: 0; }
+
 .modal-card p { font-size: 0.8125rem; line-height: 1.6; }
 
 .form-row {

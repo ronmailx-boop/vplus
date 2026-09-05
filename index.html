@@ -114,7 +114,16 @@
   <!-- Add / Edit item modal -->
   <div id="itemModal" class="modal-backdrop hidden">
     <div class="modal-card">
-      <h2 id="itemModalTitle">הוספת פריט</h2>
+      <div class="item-modal-header">
+        <h2 id="itemModalTitle">הוספת פריט</h2>
+        <label class="continuous-toggle-wrap" id="continuousToggleWrap">
+          <span class="continuous-toggle-label">⚡ הוספה רציפה</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="continuousToggle">
+            <span class="toggle-track"></span>
+          </span>
+        </label>
+      </div>
       <div class="context-bar" id="contextBar">
         <span class="context-bar-label">➕ מתווסף אל:</span>
         <button type="button" class="context-list-btn" id="contextListBtn">
@@ -173,14 +182,6 @@
 
           <label for="itemPaymentUrl">קישור תשלום</label>
           <input id="itemPaymentUrl" type="url" placeholder="https://...">
-
-          <label class="continuous-toggle-wrap" id="continuousToggleWrap" style="margin-top:12px;">
-            <span class="continuous-toggle-label">⚡ הוספה רציפה</span>
-            <span class="toggle-switch">
-              <input type="checkbox" id="continuousToggle">
-              <span class="toggle-track"></span>
-            </span>
-          </label>
         </div>
 
         <div class="modal-actions">
