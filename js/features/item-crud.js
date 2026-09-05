@@ -149,7 +149,7 @@ function openEditItemModal(itemId) {
   document.getElementById('itemModalTitle').textContent = 'עריכת פריט';
   document.getElementById('itemFormId').value = item.id;
   document.getElementById('itemName').value = item.name;
-  setAdvancedFieldsOpen(true);
+  setAdvancedFieldsOpen(false);
   document.getElementById('itemPrice').value = item.price || '';
   document.getElementById('itemQty').value = item.qty || 1;
   document.getElementById('itemCategorySelect').value = item.category || '';
