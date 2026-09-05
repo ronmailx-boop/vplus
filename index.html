@@ -114,16 +114,7 @@
   <!-- Add / Edit item modal -->
   <div id="itemModal" class="modal-backdrop hidden">
     <div class="modal-card">
-      <div class="quick-add-header">
-        <label class="continuous-toggle-wrap" id="continuousToggleWrap">
-          <span class="continuous-toggle-label">⚡ הוספה רציפה</span>
-          <span class="toggle-switch">
-            <input type="checkbox" id="continuousToggle">
-            <span class="toggle-track"></span>
-          </span>
-        </label>
-        <h2 id="itemModalTitle">הוספת פריט</h2>
-      </div>
+      <h2 id="itemModalTitle">הוספת פריט</h2>
       <div class="context-bar" id="contextBar">
         <span class="context-bar-label">➕ מתווסף אל:</span>
         <button type="button" class="context-list-btn" id="contextListBtn">
@@ -142,31 +133,38 @@
       </div>
       <form id="itemForm">
         <input type="hidden" id="itemFormId">
-        <label for="itemName" class="sr-only">שם הפריט</label>
-        <div style="position:relative;">
-          <div style="display:flex;gap:8px;">
-            <input id="itemName" type="text" required autocomplete="off" placeholder="שם הפריט" class="quick-input" style="flex:1;">
-            <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול"><i class="ph ph-microphone"></i></button>
+        <div class="quick-name-qty-row">
+          <div class="quick-name-wrap">
+            <label for="itemName" class="sr-only">שם הפריט</label>
+            <input id="itemName" type="text" required autocomplete="off" placeholder="שם הפריט" class="quick-input">
+            <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
           </div>
-          <div id="autocompleteContainer" class="autocomplete-list hidden"></div>
-        </div>
-
-        <div class="form-row quick-form-row">
-          <div>
-            <label for="itemPrice" class="sr-only">מחיר</label>
-            <input id="itemPrice" type="number" step="0.01" min="0" inputmode="decimal" placeholder="💰 מחיר" class="quick-input">
-          </div>
-          <div>
+          <div class="qty-stepper">
+            <button type="button" id="itemQtyMinus" class="qty-step-btn" aria-label="הפחת כמות"><i class="ph ph-minus"></i></button>
             <label for="itemQty" class="sr-only">כמות</label>
-            <input id="itemQty" type="number" step="1" min="1" value="1" inputmode="numeric" placeholder="🔢 כמות" class="quick-input">
+            <input id="itemQty" type="number" step="1" min="1" value="1" inputmode="numeric" class="qty-input">
+            <button type="button" id="itemQtyPlus" class="qty-step-btn" aria-label="הוסף כמות"><i class="ph ph-plus"></i></button>
           </div>
+          <button type="button" id="voiceBtn" class="icon-btn" aria-label="הוספה בקול" title="הוספה בקול"><i class="ph ph-microphone"></i></button>
         </div>
 
-        <label for="itemCategorySelect">קטגוריה</label>
-        <select id="itemCategorySelect"></select>
+        <button type="button" id="itemAdvancedToggle" class="advanced-toggle-btn">
+          <i class="ph ph-caret-down" id="itemAdvancedChevron"></i>
+          <span id="itemAdvancedToggleLabel">עוד אפשרויות</span>
+        </button>
 
-        <button type="button" id="itemAdvancedToggle" class="link-btn">הצג שדות נוספים ▾</button>
         <div id="itemAdvancedFields" class="hidden">
+          <div class="form-row">
+            <div>
+              <label for="itemPrice">מחיר</label>
+              <input id="itemPrice" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0.00">
+            </div>
+            <div>
+              <label for="itemCategorySelect">קטגוריה</label>
+              <select id="itemCategorySelect"></select>
+            </div>
+          </div>
+
           <label for="itemDueDate">תאריך יעד</label>
           <input id="itemDueDate" type="date">
 
@@ -175,6 +173,14 @@
 
           <label for="itemPaymentUrl">קישור תשלום</label>
           <input id="itemPaymentUrl" type="url" placeholder="https://...">
+
+          <label class="continuous-toggle-wrap" id="continuousToggleWrap" style="margin-top:12px;">
+            <span class="continuous-toggle-label">⚡ הוספה רציפה</span>
+            <span class="toggle-switch">
+              <input type="checkbox" id="continuousToggle">
+              <span class="toggle-track"></span>
+            </span>
+          </label>
         </div>
 
         <div class="modal-actions">

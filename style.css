@@ -753,7 +753,6 @@ label {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
-.quick-form-row { margin-top: 8px; }
 
 .sr-only {
   position: absolute;
@@ -785,6 +784,83 @@ label {
   outline-offset: 1px;
 }
 
+/* — quick add: name + quantity on one row, rest behind "עוד אפשרויות" — */
+
+.quick-name-qty-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quick-name-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.qty-stepper {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 44px;
+  padding: 0 4px;
+  border: 2px solid var(--color-neutral-900);
+  border-radius: 16px;
+  background: #f9fafb;
+}
+.qty-step-btn {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-accent-900);
+  color: var(--color-accent-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.qty-step-btn:hover { background: var(--color-accent-800); }
+.qty-step-btn:active { transform: scale(.94); }
+#itemModal .qty-input {
+  width: 26px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+#itemModal .qty-input::-webkit-outer-spin-button,
+#itemModal .qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.advanced-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 7px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-900);
+  color: var(--color-accent-100);
+  font: 700 0.75rem var(--font-body);
+  cursor: pointer;
+}
+.advanced-toggle-btn:hover { background: var(--color-accent-800); }
+.advanced-toggle-btn i { transition: transform .2s; }
+.advanced-toggle-btn.open i { transform: rotate(180deg); }
+
 .modal-actions {
   display: flex;
   gap: 8px;
@@ -793,14 +869,6 @@ label {
 .modal-actions button { flex: 1; }
 
 /* — quick add: continuous mode + target list — */
-
-.quick-add-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.quick-add-header h2 { margin: 0; }
 
 .continuous-toggle-wrap {
   display: flex;

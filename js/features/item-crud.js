@@ -89,6 +89,18 @@ function handleCreateListFromDropdown() {
   showToast(`הרשימה "${name}" נוצרה`);
 }
 
+function stepQty(delta) {
+  const input = document.getElementById('itemQty');
+  const next = Math.max(1, (parseInt(input.value, 10) || 1) + delta);
+  input.value = next;
+}
+
+function setAdvancedFieldsOpen(open) {
+  document.getElementById('itemAdvancedFields').classList.toggle('hidden', !open);
+  document.getElementById('itemAdvancedToggle').classList.toggle('open', open);
+  document.getElementById('itemAdvancedToggleLabel').textContent = open ? 'הצג פחות' : 'עוד אפשרויות';
+}
+
 function toggleContinuousMode() {
   const toggle = document.getElementById('continuousToggle');
   continuousAdd = toggle.checked;
@@ -102,7 +114,7 @@ function openAddItemModal() {
   document.getElementById('itemModalTitle').textContent = 'הוספת פריט';
   document.getElementById('itemForm').reset();
   document.getElementById('itemFormId').value = '';
-  document.getElementById('itemAdvancedFields').classList.add('hidden');
+  setAdvancedFieldsOpen(false);
 
   targetListId = db.currentId;
   updateContextBarDisplay();
@@ -123,6 +135,7 @@ function openEditItemModal(itemId) {
   document.getElementById('itemModalTitle').textContent = 'עריכת פריט';
   document.getElementById('itemFormId').value = item.id;
   document.getElementById('itemName').value = item.name;
+  setAdvancedFieldsOpen(true);
   document.getElementById('itemPrice').value = item.price || '';
   document.getElementById('itemQty').value = item.qty || 1;
   document.getElementById('itemCategorySelect').value = item.category || '';
@@ -217,8 +230,10 @@ export function initItemCrud() {
   document.getElementById('fabAddItem').addEventListener('click', openAddItemModal);
   document.getElementById('itemForm').addEventListener('submit', handleItemFormSubmit);
   document.getElementById('itemAdvancedToggle').addEventListener('click', () => {
-    document.getElementById('itemAdvancedFields').classList.toggle('hidden');
+    setAdvancedFieldsOpen(document.getElementById('itemAdvancedFields').classList.contains('hidden'));
   });
+  document.getElementById('itemQtyMinus').addEventListener('click', () => stepQty(-1));
+  document.getElementById('itemQtyPlus').addEventListener('click', () => stepQty(1));
   document.getElementById('itemsContainer').addEventListener('click', handleItemsContainerClick);
 
   document.getElementById('continuousToggle').addEventListener('change', toggleContinuousMode);
