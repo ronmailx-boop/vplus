@@ -164,6 +164,29 @@ function openEditItemModal(itemId) {
   updateItemModalScrollHint();
 }
 
+function openPriceModal(itemId) {
+  const list = getCurrentList();
+  const item = list?.items.find((i) => i.id === itemId);
+  if (!item) return;
+  document.getElementById('priceFormId').value = itemId;
+  document.getElementById('priceModalInput').value = '';
+  openModal('priceModal');
+  setTimeout(() => document.getElementById('priceModalInput').focus(), 150);
+}
+
+function handlePriceFormSubmit(e) {
+  e.preventDefault();
+  const itemId = document.getElementById('priceFormId').value;
+  const val = parseFloat(document.getElementById('priceModalInput').value);
+  const list = getCurrentList();
+  const item = itemId && list?.items.find((i) => i.id === itemId);
+  if (item && !isNaN(val) && val >= 0) {
+    editItem(db.currentId, itemId, { price: val / (item.qty || 1) });
+    render();
+  }
+  closeModal('priceModal');
+}
+
 function handleItemFormSubmit(e) {
   e.preventDefault();
   const id = document.getElementById('itemFormId').value;
@@ -235,6 +258,9 @@ function handleItemsContainerClick(e) {
   } else if (action === 'edit') {
     if (isListLocked()) return;
     openEditItemModal(itemId);
+  } else if (action === 'edit-price') {
+    if (isListLocked()) return;
+    openPriceModal(itemId);
   }
 }
 
@@ -242,6 +268,7 @@ export function initItemCrud() {
   populateCategorySelect();
   document.getElementById('fabAddItem').addEventListener('click', openAddItemModal);
   document.getElementById('itemForm').addEventListener('submit', handleItemFormSubmit);
+  document.getElementById('priceForm').addEventListener('submit', handlePriceFormSubmit);
   document.getElementById('itemAdvancedToggle').addEventListener('click', () => {
     setAdvancedFieldsOpen(document.getElementById('itemAdvancedFields').classList.contains('hidden'));
   });

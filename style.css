@@ -499,6 +499,7 @@ label {
 .item-line-total {
   font-size: 0.78125rem;
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
 }
 
 .item-card.checked { background: var(--color-neutral-900); }

@@ -121,7 +121,7 @@ function itemCardHTML(item) {
         <div class="item-name" title="${sanitize(item.name)}">${sanitize(item.name)}</div>
         <div class="item-meta">${metaParts.join(' · ')}</div>
       </div>
-      <div class="item-line-total">${lineTotal}</div>
+      <div class="item-line-total" data-action="edit-price">${lineTotal}</div>
       <div class="item-actions">
         <button data-action="delete" aria-label="מחיקת פריט" title="מחיקה"><i class="ph ph-x"></i></button>
       </div>

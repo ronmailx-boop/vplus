@@ -193,6 +193,22 @@
     </div>
   </div>
 
+  <!-- Quick price-only update modal -->
+  <div id="priceModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>עדכון מחיר</h2>
+      <form id="priceForm">
+        <input type="hidden" id="priceFormId">
+        <label for="priceModalInput" class="sr-only">מחיר חדש</label>
+        <input id="priceModalInput" type="number" step="0.01" min="0" inputmode="decimal" autocomplete="off" placeholder="מחיר כולל ליחידות">
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary modal-cancel">ביטול</button>
+          <button type="submit" class="btn-primary">עדכן</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- New / Edit list modal -->
   <div id="listModal" class="modal-backdrop hidden">
     <div class="modal-card">
