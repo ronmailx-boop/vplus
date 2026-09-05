@@ -75,10 +75,12 @@ function renderListNameBar() {
   const countEl = document.getElementById('itemCountDisplay');
   if (!list) {
     nameEl.textContent = 'אין רשימה';
+    nameEl.removeAttribute('title');
     countEl.textContent = '';
     return;
   }
   nameEl.textContent = list.name;
+  nameEl.title = list.name;
   const total = list.items.length;
   const done = list.items.filter((i) => i.checked).length;
   const budget = list.budget > 0 ? ` · תקציב ${formatCurrency(list.budget)}` : '';
