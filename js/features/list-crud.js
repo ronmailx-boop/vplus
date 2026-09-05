@@ -9,6 +9,17 @@ function openNewListModal() {
   openModal('listModal');
 }
 
+function openEditListModal(listId) {
+  const list = db.lists[listId];
+  if (!list) return;
+  document.getElementById('listModalTitle').textContent = 'עריכת רשימה';
+  document.getElementById('listFormId').value = listId;
+  document.getElementById('listNameInput').value = list.name;
+  document.getElementById('listUrlInput').value = list.url || '';
+  document.getElementById('listBudgetInput').value = list.budget || '';
+  openModal('listModal');
+}
+
 function handleListFormSubmit(e) {
   e.preventDefault();
   const id = document.getElementById('listFormId').value;
@@ -55,4 +66,7 @@ export function initListCrud() {
   document.getElementById('lnbNewListBtn').addEventListener('click', openNewListModal);
   document.getElementById('listForm').addEventListener('submit', handleListFormSubmit);
   document.getElementById('summaryContainer').addEventListener('click', handleSummaryContainerClick);
+  document.getElementById('listNameDisplay').addEventListener('click', () => {
+    if (db.currentId) openEditListModal(db.currentId);
+  });
 }
