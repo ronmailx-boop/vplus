@@ -487,11 +487,6 @@ label {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.item-name.expanded {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-}
 
 .item-meta {
   margin-top: 1px;
