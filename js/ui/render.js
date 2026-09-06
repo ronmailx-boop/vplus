@@ -118,7 +118,7 @@ function itemCardHTML(item) {
     <div class="item-card ${item.checked ? 'checked' : ''}" data-item-id="${item.id}" style="--cat:${catColor}">
       <div class="item-checkbox ${item.checked ? 'checked' : ''}" data-action="toggle"></div>
       <div class="item-main" data-action="edit">
-        <div class="item-name" title="${sanitize(item.name)}">${sanitize(item.name)}</div>
+        <div class="item-name" data-action="expand-name" title="${sanitize(item.name)}">${sanitize(item.name)}</div>
         <div class="item-meta">${metaParts.join(' · ')}</div>
       </div>
       <div class="item-line-total" data-action="edit-price">${lineTotal}</div>

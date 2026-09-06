@@ -228,6 +228,10 @@ function handleItemFormSubmit(e) {
 }
 
 function handleItemsContainerClick(e) {
+  if (nameLongPressFired) {
+    nameLongPressFired = false;
+    return;
+  }
   const card = e.target.closest('.item-card');
   if (!card) return;
   const itemId = card.dataset.itemId;
@@ -255,6 +259,8 @@ function handleItemsContainerClick(e) {
       itemShaped: true,
       accentColor: CATEGORIES[snapshot.category] || CATEGORIES['אחר'],
     });
+  } else if (action === 'expand-name') {
+    e.target.closest('.item-name').classList.toggle('expanded');
   } else if (action === 'edit') {
     if (isListLocked()) return;
     openEditItemModal(itemId);
@@ -262,6 +268,39 @@ function handleItemsContainerClick(e) {
     if (isListLocked()) return;
     openPriceModal(itemId);
   }
+}
+
+const NAME_LONG_PRESS_MS = 500;
+const NAME_LONG_PRESS_MOVE_TOLERANCE = 10;
+let nameLongPressTimer = null;
+let nameLongPressFired = false;
+let nameLongPressStart = null;
+
+function clearNameLongPress() {
+  clearTimeout(nameLongPressTimer);
+  nameLongPressTimer = null;
+  nameLongPressStart = null;
+}
+
+function handleItemsContainerPointerDown(e) {
+  const nameEl = e.target.closest('[data-action="expand-name"]');
+  const card = e.target.closest('.item-card');
+  if (!nameEl || !card) return;
+  nameLongPressStart = { x: e.clientX, y: e.clientY };
+  clearTimeout(nameLongPressTimer);
+  nameLongPressTimer = setTimeout(() => {
+    nameLongPressFired = true;
+    nameLongPressTimer = null;
+    if (isListLocked()) return;
+    openEditItemModal(card.dataset.itemId);
+  }, NAME_LONG_PRESS_MS);
+}
+
+function handleItemsContainerPointerMove(e) {
+  if (!nameLongPressStart) return;
+  const dx = e.clientX - nameLongPressStart.x;
+  const dy = e.clientY - nameLongPressStart.y;
+  if (Math.hypot(dx, dy) > NAME_LONG_PRESS_MOVE_TOLERANCE) clearNameLongPress();
 }
 
 export function initItemCrud() {
@@ -276,6 +315,11 @@ export function initItemCrud() {
   document.getElementById('itemQtyPlus').addEventListener('click', () => stepQty(1));
   document.getElementById('itemModalCard').addEventListener('scroll', updateItemModalScrollHint);
   document.getElementById('itemsContainer').addEventListener('click', handleItemsContainerClick);
+  document.getElementById('itemsContainer').addEventListener('pointerdown', handleItemsContainerPointerDown);
+  document.getElementById('itemsContainer').addEventListener('pointermove', handleItemsContainerPointerMove);
+  document.getElementById('itemsContainer').addEventListener('pointerup', clearNameLongPress);
+  document.getElementById('itemsContainer').addEventListener('pointercancel', clearNameLongPress);
+  document.getElementById('itemsContainer').addEventListener('pointerleave', clearNameLongPress, true);
 
   document.getElementById('continuousToggle').addEventListener('change', toggleContinuousMode);
   document.getElementById('contextListBtn').addEventListener('click', toggleListDropdown);
