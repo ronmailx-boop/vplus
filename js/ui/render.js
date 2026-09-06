@@ -92,11 +92,12 @@ function renderListNameBar() {
 }
 
 function itemCardHTML(item) {
-  const metaParts = [];
-  if (item.qty > 1) metaParts.push(`×${item.qty}`);
-  if (item.price) metaParts.push(`${formatCurrency(item.price)} ליח'`);
-  if (item.dueDate) metaParts.push(formatDate(item.dueDate));
-  if (item.note) metaParts.push(sanitize(item.note));
+  const qtyLabel = item.qty > 1 ? `×${item.qty}` : null;
+  const restMetaParts = [];
+  if (item.price) restMetaParts.push(`${formatCurrency(item.price)} ליח'`);
+  if (item.dueDate) restMetaParts.push(formatDate(item.dueDate));
+  if (item.note) restMetaParts.push(sanitize(item.note));
+  const metaParts = qtyLabel ? [qtyLabel, ...restMetaParts] : restMetaParts;
   const lineTotal = item.price ? formatCurrency(item.price * item.qty) : '';
   const catColor = CATEGORIES[item.category] || CATEGORIES['אחר'];
 
@@ -119,7 +120,10 @@ function itemCardHTML(item) {
       <div class="item-checkbox ${item.checked ? 'checked' : ''}" data-action="toggle"></div>
       <div class="item-main" data-action="edit">
         <div class="item-name" data-action="expand-name" title="${sanitize(item.name)}">${sanitize(item.name)}</div>
-        <div class="item-meta">${metaParts.join(' · ')}</div>
+        <div class="item-meta">
+          ${qtyLabel ? `<span class="qty-chip">${qtyLabel}</span>` : ''}
+          ${restMetaParts.length ? `<span>${restMetaParts.join(' · ')}</span>` : ''}
+        </div>
       </div>
       <div class="item-line-total" data-action="edit-price">${lineTotal}</div>
       <div class="item-actions">
