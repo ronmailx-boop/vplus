@@ -487,6 +487,13 @@ label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.item-name.expanded {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .item-meta {
