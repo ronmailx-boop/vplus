@@ -73,10 +73,12 @@ function renderListNameBar() {
   const list = getCurrentList();
   const nameEl = document.getElementById('listNameDisplay');
   const countEl = document.getElementById('itemCountDisplay');
+  const sharedIndicator = document.getElementById('sharedIndicator');
   if (!list) {
     nameEl.textContent = 'אין רשימה';
     nameEl.removeAttribute('title');
     countEl.textContent = '';
+    sharedIndicator.classList.add('hidden');
     return;
   }
   nameEl.textContent = list.name;
@@ -85,6 +87,7 @@ function renderListNameBar() {
   const done = list.items.filter((i) => i.checked).length;
   const budget = list.budget > 0 ? ` · תקציב ${formatCurrency(list.budget)}` : '';
   countEl.textContent = `${done}/${total} נאספו${budget}`;
+  sharedIndicator.classList.toggle('hidden', !list.shareId);
 
   const lockBtn = document.getElementById('lockListBtn');
   lockBtn.innerHTML = `<i class="ph ${list.locked ? 'ph-lock' : 'ph-lock-open'}"></i>`;

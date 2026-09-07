@@ -308,11 +308,14 @@ function handleVisibilityChange() {
   if (current?.shareId) subscribeToList(current.shareId);
 }
 
+function openLiveShareModal() {
+  refreshLiveShareModal();
+  openModal('liveShareModal');
+}
+
 export function initCollab() {
-  document.getElementById('liveShareBtn').addEventListener('click', () => {
-    refreshLiveShareModal();
-    openModal('liveShareModal');
-  });
+  document.getElementById('liveShareBtn').addEventListener('click', openLiveShareModal);
+  document.getElementById('sharedIndicator').addEventListener('click', openLiveShareModal);
   document.getElementById('liveShareEnableBtn').addEventListener('click', handleEnableClick);
   document.getElementById('liveShareSendBtn').addEventListener('click', handleSendClick);
   document.getElementById('liveShareLinkInput').addEventListener('focus', handleLinkInputFocus);
