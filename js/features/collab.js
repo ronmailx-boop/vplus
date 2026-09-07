@@ -1,5 +1,6 @@
 import { db, getCurrentList, makeListId, save } from '../core/store.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../core/supabase-config.js';
+import { getShareCode } from '../core/utils.js';
 import { render, onRender } from '../ui/render.js';
 import { openModal, showToast } from '../ui/modals.js';
 
@@ -250,11 +251,13 @@ function refreshLiveShareModal() {
   const list = getCurrentList();
   const linkWrap = document.getElementById('liveShareLinkWrap');
   const linkInput = document.getElementById('liveShareLinkInput');
+  const codeDisplay = document.getElementById('liveShareCodeDisplay');
   const enableBtn = document.getElementById('liveShareEnableBtn');
   const sendBtn = document.getElementById('liveShareSendBtn');
 
   if (list?.shareId) {
     linkInput.value = getShareLink(list.shareId);
+    codeDisplay.textContent = `קוד: ${getShareCode(list.shareId)}`;
     linkWrap.classList.remove('hidden');
     enableBtn.classList.add('hidden');
     sendBtn.classList.remove('hidden');

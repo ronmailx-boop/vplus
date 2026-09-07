@@ -15,6 +15,14 @@ export function formatDate(dateStr) {
   return d.toLocaleDateString("he-IL");
 }
 
+export function getShareCode(shareId) {
+  let hash = 0;
+  for (let i = 0; i < shareId.length; i++) {
+    hash = (hash * 31 + shareId.charCodeAt(i)) >>> 0;
+  }
+  return String(hash % 10000).padStart(4, '0');
+}
+
 export function debounce(fn, delay) {
   let timer;
   return (...args) => {
