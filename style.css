@@ -161,6 +161,14 @@ body {
   cursor: pointer;
 }
 
+.share-code-display {
+  margin-top: 8px;
+  text-align: center;
+  font: 700 1.125rem var(--font-body);
+  letter-spacing: 0.15em;
+  color: var(--color-accent);
+}
+
 .toolbar-row {
   flex: none;
   display: flex;

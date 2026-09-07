@@ -1,6 +1,6 @@
 import { db, getCurrentList, calcListTotal, calcListPaid, sortItemsByStatusAndCategory } from '../core/store.js';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ORDER } from '../core/constants.js';
-import { sanitize, formatCurrency, formatDate } from '../core/utils.js';
+import { sanitize, formatCurrency, formatDate, getShareCode } from '../core/utils.js';
 import { renderCharts } from '../features/stats.js';
 
 /* Nocturne redesign: categories are marked by an accent rule + label, not by a
@@ -88,6 +88,7 @@ function renderListNameBar() {
   const budget = list.budget > 0 ? ` · תקציב ${formatCurrency(list.budget)}` : '';
   countEl.textContent = `${done}/${total} נאספו${budget}`;
   sharedIndicator.classList.toggle('hidden', !list.shareId);
+  if (list.shareId) sharedIndicator.textContent = `🔗 משותף · ${getShareCode(list.shareId)}`;
 
   const lockBtn = document.getElementById('lockListBtn');
   lockBtn.innerHTML = `<i class="ph ${list.locked ? 'ph-lock' : 'ph-lock-open'}"></i>`;
