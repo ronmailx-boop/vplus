@@ -176,6 +176,7 @@ function renderItemsPage() {
     return;
   }
 
+  const lightViewOn = document.documentElement.dataset.lightView === '1';
   const sorted = sortItemsByStatusAndCategory(list.items, CATEGORY_ORDER);
   const catSum = {};
   for (const item of sorted) {
@@ -190,7 +191,7 @@ function renderItemsPage() {
 
   for (const item of sorted) {
     if (!item.checked) {
-      if (item.category !== lastCategory) {
+      if (!lightViewOn && item.category !== lastCategory) {
         html += categoryHeaderHTML(item.category, catSum[item.category] || 0);
         lastCategory = item.category;
       }

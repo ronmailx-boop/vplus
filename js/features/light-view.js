@@ -1,3 +1,5 @@
+import { render } from '../ui/render.js';
+
 const LIGHT_VIEW_KEY = 'vplus_light_view';
 
 function isLightViewOn() {
@@ -17,5 +19,8 @@ function applyLightView(on) {
 export function initLightView() {
   const btn = document.getElementById('lightViewBtn');
   applyLightView(isLightViewOn());
-  btn.addEventListener('click', () => applyLightView(!isLightViewOn()));
+  btn.addEventListener('click', () => {
+    applyLightView(!isLightViewOn());
+    render();
+  });
 }
