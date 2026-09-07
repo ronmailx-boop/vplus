@@ -403,6 +403,7 @@ label {
 .pill-row {
   flex: none;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 4px 16px 10px;
   position: sticky;
