@@ -148,6 +148,9 @@ export function getShareLink(shareId) {
   url.hash = '';
   url.search = '';
   url.searchParams.set('share', shareId);
+  // Not read by the app — appended so the code is visible in the raw link text itself
+  // (WhatsApp/Keep/email show the full URL even without a rich preview card).
+  url.searchParams.set('code', getShareCode(shareId));
   return url.toString();
 }
 
