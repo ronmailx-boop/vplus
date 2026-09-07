@@ -49,7 +49,10 @@
           <button type="button" id="sharedIndicator" class="shared-indicator hidden">🔗 משותף</button>
         </div>
       </div>
-      <button id="lnbNewListBtn" class="icon-btn" aria-label="רשימה חדשה" title="רשימה חדשה"><i class="ph ph-plus-circle"></i></button>
+      <div class="lnb-actions">
+        <button id="openDeleteShortcutBtn" class="icon-btn icon-btn-danger" aria-label="מחק פריטים" title="מחק"><i class="ph ph-x-circle"></i></button>
+        <button id="lnbNewListBtn" class="icon-btn" aria-label="רשימה חדשה" title="רשימה חדשה"><i class="ph ph-plus-circle"></i></button>
+      </div>
     </div>
 
     <div id="bulkDeleteRow" class="toolbar-row hidden">
@@ -68,7 +71,6 @@
         <button id="shareListBtn" class="pill pill-purple" aria-label="שתף רשימה" title="שתף רשימה"><i class="ph ph-share-network"></i></button>
         <button id="liveShareBtn" class="pill pill-purple" aria-label="שיתוף חי בין כמה אנשים" title="שיתוף חי"><i class="ph ph-users-three"></i></button>
         <button id="openStatsShortcutBtn" class="pill pill-purple" aria-label="הצג סכום" title="הצג סכום">📊 הצג סכום</button>
-        <button id="openDeleteShortcutBtn" class="pill pill-red" aria-label="מחק פריטים" title="מחק">🗑️ מחק</button>
       </div>
       <div id="budgetWarning" class="budget-warning hidden"></div>
       <div id="typingIndicator" class="typing-indicator hidden" aria-live="polite">✍️ מישהו מזין פריט כרגע...</div>
