@@ -128,6 +128,12 @@ body {
 
 .lnb-info { min-width: 0; }
 
+.lnb-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .list-name-display {
   font: 500 1.3125rem/1.2 var(--font-heading);
   white-space: nowrap;
@@ -197,6 +203,9 @@ body {
 }
 .icon-btn:hover { background: var(--color-neutral-900); color: var(--color-text); }
 .icon-btn:active { background: var(--color-neutral-800); }
+
+.icon-btn-danger { color: var(--color-danger); }
+.icon-btn-danger:hover { background: rgba(239,68,68,.12); color: var(--color-danger); }
 .icon-btn.active { background: var(--color-accent-900); color: var(--color-accent-100); }
 
 .btn-primary,
