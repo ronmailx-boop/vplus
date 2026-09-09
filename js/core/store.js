@@ -46,6 +46,8 @@ function normalizeList(list) {
     url: list.url || '',
     budget: Number(list.budget) || 0,
     locked: !!list.locked,
+    shareId: list.shareId || undefined,
+    deletedIds: Array.isArray(list.deletedIds) ? list.deletedIds : [],
     items: Array.isArray(list.items) ? list.items.map(normalizeItem) : [],
   };
 }

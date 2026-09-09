@@ -203,6 +203,14 @@ export async function joinSharedList(shareId) {
     save();
     subscribeToList(shareId);
     render();
+
+    // Leaving ?share=... in the address bar would re-run this whole join on every plain
+    // reload of the tab — harmless once shareId itself survives reloads, but still an
+    // unnecessary re-fetch. Drop it without adding a history entry or reloading the page.
+    const url = new URL(location.href);
+    url.searchParams.delete('share');
+    url.searchParams.delete('code');
+    history.replaceState(null, '', url);
   } catch {
     showToast('לא ניתן לטעון את הרשימה המשותפת — בדקו חיבור לרשת');
   }
