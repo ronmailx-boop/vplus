@@ -7,6 +7,7 @@ function buildShareText() {
   const list = getCurrentList();
   if (!list || !list.items.length) return null;
 
+  const lightViewOn = document.documentElement.dataset.lightView === '1';
   const sorted = sortItemsByStatusAndCategory(list.items, CATEGORY_ORDER);
   const catSums = {};
   sorted.forEach((item) => {
@@ -22,7 +23,7 @@ function buildShareText() {
   let itemNum = 0;
   sorted.forEach((item) => {
     if (!item.checked) {
-      if (item.category !== lastCategory) {
+      if (!lightViewOn && item.category !== lastCategory) {
         const label = CATEGORY_LABELS[item.category] || item.category;
         text += `\n${label} — ${formatCurrency(catSums[item.category])}\n`;
         lastCategory = item.category;
