@@ -1,4 +1,4 @@
-const CACHE_NAME = "vplus-v37";
+const CACHE_NAME = "vplus-v38";
 const PRECACHE_URLS = [
   "./",
   "./index.html",

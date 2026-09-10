@@ -57,6 +57,8 @@ html {
 }
 html[data-text-scale="2"] { font-size: 112%; }
 html[data-text-scale="3"] { font-size: 125%; }
+html[data-text-scale="4"] { font-size: 138%; }
+html[data-text-scale="5"] { font-size: 150%; }
 
 body {
   margin: 0;
