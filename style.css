@@ -169,6 +169,17 @@ body {
   cursor: pointer;
 }
 
+.owner-indicator {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  background: rgba(234, 179, 8, .14);
+  color: #a16207;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font: 700 0.625rem var(--font-body);
+}
+
 .share-code-display {
   margin-top: 8px;
   text-align: center;
