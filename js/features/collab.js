@@ -175,24 +175,43 @@ export function getShareLink(shareId) {
   return url.toString();
 }
 
+let pendingParticipantNameResolve = null;
+
 function ensureParticipantName() {
-  if (getParticipantName()) return;
-  const input = document.getElementById('participantNameInput');
-  input.value = '';
-  openModal('participantNameModal');
-  setTimeout(() => input.focus(), 80);
+  return new Promise((resolve) => {
+    const existing = getParticipantName();
+    if (existing) {
+      resolve(existing);
+      return;
+    }
+    pendingParticipantNameResolve = resolve;
+    const input = document.getElementById('participantNameInput');
+    input.value = '';
+    openModal('participantNameModal');
+    setTimeout(() => input.focus(), 80);
+  });
+}
+
+function resolvePendingParticipantName(name) {
+  if (pendingParticipantNameResolve) {
+    pendingParticipantNameResolve(name);
+    pendingParticipantNameResolve = null;
+  }
 }
 
 function handleParticipantNameSubmit(e) {
   e.preventDefault();
-  const name = document.getElementById('participantNameInput').value.trim();
-  setParticipantName(name || fallbackParticipantName());
+  const name = document.getElementById('participantNameInput').value.trim() || fallbackParticipantName();
+  setParticipantName(name);
   closeModal('participantNameModal');
+  resolvePendingParticipantName(name);
 }
 
 function handleParticipantNameSkip() {
-  setParticipantName(fallbackParticipantName());
+  const name = fallbackParticipantName();
+  setParticipantName(name);
   closeModal('participantNameModal');
+  resolvePendingParticipantName(name);
 }
 
 export async function enableSharing(listId) {
@@ -200,6 +219,7 @@ export async function enableSharing(listId) {
   if (!list) return null;
   if (list.shareId) return list.shareId;
   list.deletedIds = list.deletedIds || [];
+  list.ownerName = await ensureParticipantName();
 
   try {
     const client = await getClient();
@@ -215,7 +235,6 @@ export async function enableSharing(listId) {
     lastSyncedItemIds = new Set(list.items.map((item) => item.id));
     save();
     subscribeToList(list.shareId);
-    ensureParticipantName();
     return list.shareId;
   } catch {
     showToast('שגיאה בהפעלת שיתוף — בדקו חיבור לרשת ונסו שוב');
@@ -380,6 +399,11 @@ export function initCollab() {
   document.getElementById('itemName').addEventListener('input', sendTypingPing);
   document.getElementById('participantNameForm').addEventListener('submit', handleParticipantNameSubmit);
   document.getElementById('participantNameSkipBtn').addEventListener('click', handleParticipantNameSkip);
+  // Dismissing by tapping outside the card must still resolve the pending promise (same as
+  // Skip) — otherwise a caller awaiting ensureParticipantName() (e.g. enableSharing) hangs forever.
+  document.getElementById('participantNameModal').addEventListener('click', (e) => {
+    if (e.target.id === 'participantNameModal') handleParticipantNameSkip();
+  });
 
   onRender(pushCurrentListIfShared);
 

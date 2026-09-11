@@ -80,6 +80,7 @@ function renderListNameBar() {
     nameEl.removeAttribute('title');
     countEl.textContent = '';
     sharedIndicator.classList.add('hidden');
+    document.getElementById('ownerIndicator').classList.add('hidden');
     return;
   }
   nameEl.textContent = list.name;
@@ -90,6 +91,9 @@ function renderListNameBar() {
   countEl.textContent = `${done}/${total} נאספו${budget}`;
   sharedIndicator.classList.toggle('hidden', !list.shareId);
   if (list.shareId) sharedIndicator.textContent = `🔗 משותף · ${getShareCode(list.shareId)}`;
+
+  const ownerIndicator = document.getElementById('ownerIndicator');
+  ownerIndicator.classList.toggle('hidden', !(list.shareId && list.ownerName && list.ownerName === getParticipantName()));
 
   const lockBtn = document.getElementById('lockListBtn');
   lockBtn.innerHTML = `<i class="ph ${list.locked ? 'ph-lock' : 'ph-lock-open'}"></i>`;

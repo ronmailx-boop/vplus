@@ -1,6 +1,6 @@
 import { db, getCurrentList, createList, addItem, insertItem, editItem, deleteItem, toggleItemChecked, save } from '../core/store.js';
 import { CATEGORIES } from '../core/constants.js';
-import { openModal, closeModal, showToast } from '../ui/modals.js';
+import { openModal, closeModal, showToast, confirmDialog } from '../ui/modals.js';
 import { render } from '../ui/render.js';
 
 const CONTINUOUS_ADD_KEY = 'vplus_continuous_add';
@@ -227,7 +227,7 @@ function handleItemFormSubmit(e) {
   }
 }
 
-function handleItemsContainerClick(e) {
+async function handleItemsContainerClick(e) {
   if (nameLongPressFired) {
     nameLongPressFired = false;
     return;
@@ -244,6 +244,10 @@ function handleItemsContainerClick(e) {
   } else if (action === 'delete') {
     if (isListLocked()) return;
     const list = getCurrentList();
+    if (list.shareId) {
+      const ok = await confirmDialog(`למחוק את "${list.items.find((i) => i.id === itemId)?.name}"?`);
+      if (!ok) return;
+    }
     const snapshotIndex = list.items.findIndex((i) => i.id === itemId);
     const snapshot = { ...list.items[snapshotIndex] };
     const anchorRect = card.getBoundingClientRect();

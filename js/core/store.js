@@ -50,6 +50,7 @@ function normalizeList(list) {
     budget: Number(list.budget) || 0,
     locked: !!list.locked,
     shareId: list.shareId || undefined,
+    ownerName: list.ownerName || undefined,
     deletedIds: Array.isArray(list.deletedIds) ? list.deletedIds : [],
     items: Array.isArray(list.items) ? list.items.map(normalizeItem) : [],
   };

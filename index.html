@@ -47,6 +47,7 @@
         <div class="lnb-meta-row">
           <div id="itemCountDisplay" class="item-count-display"></div>
           <button type="button" id="sharedIndicator" class="shared-indicator hidden">🔗 משותף</button>
+          <span id="ownerIndicator" class="owner-indicator hidden">👑 הרשימה שלך</span>
         </div>
       </div>
       <div class="lnb-actions">
@@ -216,21 +217,6 @@
     </div>
   </div>
 
-  <!-- Participant display-name prompt (shared-list attribution) -->
-  <div id="participantNameModal" class="modal-backdrop hidden">
-    <div class="modal-card">
-      <h2>איך לקרוא לך?</h2>
-      <form id="participantNameForm">
-        <label for="participantNameInput" class="sr-only">שם תצוגה</label>
-        <input id="participantNameInput" type="text" autocomplete="off" placeholder="לדוגמה: דני" maxlength="20">
-        <div class="modal-actions">
-          <button type="button" id="participantNameSkipBtn" class="btn-secondary">דלג</button>
-          <button type="submit" class="btn-primary">שמירה</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- New / Edit list modal -->
   <div id="listModal" class="modal-backdrop hidden">
     <div class="modal-card">
@@ -323,6 +309,22 @@
         <button type="button" class="btn-secondary modal-cancel">ביטול</button>
         <button type="button" id="confirmModalOkBtn" class="btn-danger">אישור</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Participant display-name prompt (shared-list attribution) — last in DOM order so it
+       always stacks above any other modal it may be triggered underneath (e.g. live-share). -->
+  <div id="participantNameModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>איך לקרוא לך?</h2>
+      <form id="participantNameForm">
+        <label for="participantNameInput" class="sr-only">שם תצוגה</label>
+        <input id="participantNameInput" type="text" autocomplete="off" placeholder="לדוגמה: דני" maxlength="20">
+        <div class="modal-actions">
+          <button type="button" id="participantNameSkipBtn" class="btn-secondary">דלג</button>
+          <button type="submit" class="btn-primary">שמירה</button>
+        </div>
+      </form>
     </div>
   </div>
 
