@@ -1,4 +1,5 @@
 import { STORAGE_KEY, detectCategory } from './constants.js';
+import { getParticipantName } from './participant.js';
 
 export function makeListId() {
   return 'L' + Date.now();
@@ -37,6 +38,8 @@ export function normalizeItem(item) {
     paymentUrl: item.paymentUrl || '',
     isPaid: !!item.isPaid,
     lastUpdated: item.lastUpdated || Date.now(),
+    addedBy: item.addedBy || undefined,
+    addedAt: item.addedAt || undefined,
   };
 }
 
@@ -148,7 +151,12 @@ export function addItem(listId, itemData) {
   const list = db.lists[listId];
   if (!list) return null;
   const learned = db.categoryMemory[(itemData.name || '').toLowerCase().trim()];
-  const item = normalizeItem({ ...itemData, category: itemData.category || learned });
+  const item = normalizeItem({
+    addedBy: getParticipantName() || undefined,
+    addedAt: Date.now(),
+    ...itemData,
+    category: itemData.category || learned,
+  });
   list.items.push(item);
   db.pricebook[item.name.toLowerCase().trim()] = { price: item.price, category: item.category };
   save();
@@ -158,7 +166,7 @@ export function addItem(listId, itemData) {
 export function insertItem(listId, index, itemData) {
   const list = db.lists[listId];
   if (!list) return null;
-  const item = normalizeItem(itemData);
+  const item = normalizeItem({ addedBy: getParticipantName() || undefined, addedAt: Date.now(), ...itemData });
   const at = Math.max(0, Math.min(index, list.items.length));
   list.items.splice(at, 0, item);
   db.pricebook[item.name.toLowerCase().trim()] = { price: item.price, category: item.category };

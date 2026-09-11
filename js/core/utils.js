@@ -15,6 +15,16 @@ export function formatDate(dateStr) {
   return d.toLocaleDateString("he-IL");
 }
 
+export function formatAddedAt(timestamp) {
+  if (!timestamp) return '';
+  const d = new Date(timestamp);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  return sameDay
+    ? d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
+    : d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+}
+
 export function getShareCode(shareId) {
   let hash = 0;
   for (let i = 0; i < shareId.length; i++) {

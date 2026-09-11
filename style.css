@@ -409,6 +409,16 @@ label {
   color: var(--color-accent);
 }
 
+.new-item-banner {
+  margin: 14px 16px 0;
+  padding: 6px 11px;
+  border-radius: var(--radius-md);
+  background: rgba(115, 103, 240, .1);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
 /* — pill row (edit/stats/delete shortcuts) — */
 
 .pill-row {

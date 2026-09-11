@@ -74,6 +74,7 @@
       </div>
       <div id="budgetWarning" class="budget-warning hidden"></div>
       <div id="typingIndicator" class="typing-indicator hidden" aria-live="polite">✍️ מישהו מזין פריט כרגע...</div>
+      <div id="newItemBanner" class="new-item-banner hidden" aria-live="polite"></div>
       <div id="itemsContainer" class="items-container"></div>
       <div id="listTotalsBar" class="list-totals-bar hidden">
         <div class="totals-numbers">
@@ -210,6 +211,21 @@
         <div class="modal-actions">
           <button type="button" class="btn-secondary modal-cancel">ביטול</button>
           <button type="submit" class="btn-primary">עדכן</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Participant display-name prompt (shared-list attribution) -->
+  <div id="participantNameModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h2>איך לקרוא לך?</h2>
+      <form id="participantNameForm">
+        <label for="participantNameInput" class="sr-only">שם תצוגה</label>
+        <input id="participantNameInput" type="text" autocomplete="off" placeholder="לדוגמה: דני" maxlength="20">
+        <div class="modal-actions">
+          <button type="button" id="participantNameSkipBtn" class="btn-secondary">דלג</button>
+          <button type="submit" class="btn-primary">שמירה</button>
         </div>
       </form>
     </div>
