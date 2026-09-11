@@ -1,6 +1,7 @@
 import { db, getCurrentList, calcListTotal, calcListPaid, sortItemsByStatusAndCategory } from '../core/store.js';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ORDER } from '../core/constants.js';
-import { sanitize, formatCurrency, formatDate, getShareCode } from '../core/utils.js';
+import { sanitize, formatCurrency, formatDate, formatAddedAt, getShareCode } from '../core/utils.js';
+import { getParticipantName } from '../core/participant.js';
 import { renderCharts } from '../features/stats.js';
 
 /* Nocturne redesign: categories are marked by an accent rule + label, not by a
@@ -101,6 +102,9 @@ function itemCardHTML(item) {
   if (item.price) restMetaParts.push(`${formatCurrency(item.price)} ליח'`);
   if (item.dueDate) restMetaParts.push(formatDate(item.dueDate));
   if (item.note) restMetaParts.push(sanitize(item.note));
+  if (item.addedBy && item.addedBy !== getParticipantName() && getCurrentList()?.shareId) {
+    restMetaParts.push(`${sanitize(item.addedBy)} · ${formatAddedAt(item.addedAt)}`);
+  }
   const metaParts = qtyLabel ? [qtyLabel, ...restMetaParts] : restMetaParts;
   const lineTotal = item.price ? formatCurrency(item.price * item.qty) : '';
   const catColor = CATEGORIES[item.category] || CATEGORIES['אחר'];

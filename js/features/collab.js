@@ -1,12 +1,14 @@
 import { db, getCurrentList, makeListId, save } from '../core/store.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../core/supabase-config.js';
 import { getShareCode } from '../core/utils.js';
+import { getParticipantName, setParticipantName, fallbackParticipantName } from '../core/participant.js';
 import { render, onRender } from '../ui/render.js';
-import { openModal, showToast } from '../ui/modals.js';
+import { openModal, closeModal, showToast } from '../ui/modals.js';
 
 const POLL_INTERVAL_MS = 4000;
 const TYPING_PING_THROTTLE_MS = 2000;
 const TYPING_INDICATOR_HIDE_MS = 3500;
+const NEW_ITEM_BANNER_HIDE_MS = 4000;
 
 let supabaseClient = null;
 let channel = null;
@@ -15,6 +17,7 @@ let pollTimer = null;
 let lastKnownUpdatedAt = null;
 let lastTypingPingAt = 0;
 let typingHideTimer = null;
+let newItemBannerHideTimer = null;
 let suppressNextPush = false;
 let lastSyncedItemIds = null;
 
@@ -55,6 +58,7 @@ function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
   const listId = findListByShareId(shareId);
   if (!listId) return;
   const localList = db.lists[listId];
+  const previousIds = new Set((localList?.items || []).map((item) => item.id));
   const remoteDeletedIds = remoteData.deletedIds || [];
   const deletedIds = Array.from(new Set([...(localList?.deletedIds || []), ...remoteDeletedIds]));
   const items = localList ? mergeItems(localList.items, remoteData.items, deletedIds) : remoteData.items;
@@ -65,8 +69,25 @@ function applyRemoteUpdate(shareId, remoteData, remoteUpdatedAt) {
     lastSyncedItemIds = new Set(items.map((item) => item.id));
     // This remote update already reflects everything we merged in — nothing to push back.
     if (!healedNewInfo) suppressNextPush = true;
+    if (localList) {
+      const myName = getParticipantName();
+      items
+        .filter((item) => !previousIds.has(item.id) && item.addedBy && item.addedBy !== myName)
+        .forEach(showNewItemBanner);
+    }
     render();
   }
+}
+
+function showNewItemBanner(item) {
+  const banner = document.getElementById('newItemBanner');
+  if (!banner) return;
+  banner.textContent = `🆕 ${item.addedBy} הוסיף/ה ${item.name}`;
+  banner.classList.remove('hidden');
+  clearTimeout(newItemBannerHideTimer);
+  newItemBannerHideTimer = setTimeout(() => {
+    banner.classList.add('hidden');
+  }, NEW_ITEM_BANNER_HIDE_MS);
 }
 
 function stopPolling() {
@@ -154,6 +175,26 @@ export function getShareLink(shareId) {
   return url.toString();
 }
 
+function ensureParticipantName() {
+  if (getParticipantName()) return;
+  const input = document.getElementById('participantNameInput');
+  input.value = '';
+  openModal('participantNameModal');
+  setTimeout(() => input.focus(), 80);
+}
+
+function handleParticipantNameSubmit(e) {
+  e.preventDefault();
+  const name = document.getElementById('participantNameInput').value.trim();
+  setParticipantName(name || fallbackParticipantName());
+  closeModal('participantNameModal');
+}
+
+function handleParticipantNameSkip() {
+  setParticipantName(fallbackParticipantName());
+  closeModal('participantNameModal');
+}
+
 export async function enableSharing(listId) {
   const list = db.lists[listId];
   if (!list) return null;
@@ -174,6 +215,7 @@ export async function enableSharing(listId) {
     lastSyncedItemIds = new Set(list.items.map((item) => item.id));
     save();
     subscribeToList(list.shareId);
+    ensureParticipantName();
     return list.shareId;
   } catch {
     showToast('שגיאה בהפעלת שיתוף — בדקו חיבור לרשת ונסו שוב');
@@ -203,6 +245,7 @@ export async function joinSharedList(shareId) {
     save();
     subscribeToList(shareId);
     render();
+    ensureParticipantName();
 
     // Leaving ?share=... in the address bar would re-run this whole join on every plain
     // reload of the tab — harmless once shareId itself survives reloads, but still an
@@ -335,6 +378,8 @@ export function initCollab() {
   document.getElementById('liveShareLinkInput').addEventListener('focus', handleLinkInputFocus);
   document.addEventListener('visibilitychange', handleVisibilityChange);
   document.getElementById('itemName').addEventListener('input', sendTypingPing);
+  document.getElementById('participantNameForm').addEventListener('submit', handleParticipantNameSubmit);
+  document.getElementById('participantNameSkipBtn').addEventListener('click', handleParticipantNameSkip);
 
   onRender(pushCurrentListIfShared);
 
@@ -344,6 +389,9 @@ export function initCollab() {
     joinSharedList(shareId);
   } else {
     const current = getCurrentList();
-    if (current?.shareId) subscribeToList(current.shareId);
+    if (current?.shareId) {
+      subscribeToList(current.shareId);
+      ensureParticipantName();
+    }
   }
 }
