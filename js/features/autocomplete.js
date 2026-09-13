@@ -1,6 +1,10 @@
 import { db, save } from '../core/store.js';
-import { openModal } from '../ui/modals.js';
+import { openModal, confirmDialog } from '../ui/modals.js';
 import { formatCurrency, sanitize } from '../core/utils.js';
+
+const SWIPE_THRESHOLD = 40;
+let swipeStart = null;
+let swipeFired = false;
 
 function visibleEntries() {
   return Object.entries(db.pricebook).filter(([name]) => !db.hiddenFromAutocomplete.includes(name));
@@ -42,6 +46,41 @@ function selectSuggestion(el) {
   document.getElementById('autocompleteContainer').classList.add('hidden');
 }
 
+async function hideSuggestion(item) {
+  const name = item.dataset.name;
+  const ok = await confirmDialog(`למחוק את "${name}" מההשלמה האוטומטית?`);
+  if (ok) {
+    db.hiddenFromAutocomplete.push(name);
+    save();
+    renderSuggestions(document.getElementById('itemName').value);
+  } else {
+    item.classList.remove('swiping');
+  }
+}
+
+function handleSwipeStart(e) {
+  const item = e.target.closest('.autocomplete-item');
+  if (!item) return;
+  swipeStart = { x: e.clientX, y: e.clientY, item };
+  swipeFired = false;
+}
+
+function handleSwipeMove(e) {
+  if (!swipeStart) return;
+  const dx = e.clientX - swipeStart.x;
+  const dy = e.clientY - swipeStart.y;
+  const past = Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy);
+  swipeFired = past;
+  swipeStart.item.classList.toggle('swiping', past);
+}
+
+function handleSwipeEnd() {
+  if (swipeStart && swipeFired) {
+    hideSuggestion(swipeStart.item);
+  }
+  swipeStart = null;
+}
+
 export function initAutocomplete() {
   const nameInput = document.getElementById('itemName');
   const container = document.getElementById('autocompleteContainer');
@@ -49,9 +88,14 @@ export function initAutocomplete() {
   nameInput.addEventListener('input', () => renderSuggestions(nameInput.value));
   nameInput.addEventListener('blur', () => setTimeout(() => container.classList.add('hidden'), 150));
   container.addEventListener('mousedown', (e) => {
+    if (swipeFired) return;
     const item = e.target.closest('.autocomplete-item');
     if (item) selectSuggestion(item);
   });
+  container.addEventListener('pointerdown', handleSwipeStart);
+  container.addEventListener('pointermove', handleSwipeMove);
+  container.addEventListener('pointerup', handleSwipeEnd);
+  container.addEventListener('pointercancel', handleSwipeEnd);
 }
 
 function renderMacheron(filterTerm = '') {
